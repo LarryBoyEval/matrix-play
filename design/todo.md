@@ -1,16 +1,14 @@
 # Development Activity Planner
 
 ## 🔥 Next Up (start here every session)
-- [x] Move 'Next Prompt' from design notebook to formal `todo.md`
-- [x] Code refactor: target large blocks
+
+### Notation Prototypes
+- [ ] Prototype Personal Conveyance notation
+- [ ] Prototype Yard Move notation
 
 ---
 
 ## ⚡ Active Work
-
-### Notation Prototypes
-- [ ] Prototype Yard Move notation
-- [ ] Prototype Personal Conveyance notation
 
 ### Driving / Duty Limits
 - [ ] Prototype driving, shift, on-duty, and multi-day limits
@@ -98,6 +96,10 @@
 ### 2026-04-08
 - Initialized repo and first commit
 
-### 2026-04-09 10:33a
+### 2026-04-09 
+10:33a
 - Established TODO workflow
 - Identified need for timezone abstraction
+11:14a
+- [x] Move 'Next Prompt' from design notebook to formal `todo.md`
+- [x] Code refactor: target large blocks

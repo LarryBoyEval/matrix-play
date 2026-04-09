@@ -277,6 +277,101 @@ Core assumption for this visualization system:
 
 ---
 
+## ⚠️ Risky Movement: Yard Moves and Personal Conveyance
+
+### Core Concepts
+- Personal Conveyance (PC) converts **movement → off-duty**
+  - Hides both driving and on-duty time
+  - Highest audit risk
+- Yard Moves (YM) convert **driving → on-duty (non-driving)**
+  - Still consumes duty time
+  - Lower, but still meaningful risk
+
+- Key rule:
+  - YM is always **on-duty**
+  - Movement while off-duty (truck stop, hotel, etc.) = **PC**, not YM
+
+---
+
+### Risk Dimensions
+
+#### 1. Time / Duration
+- Total PC time (per day / rolling window)
+- Total YM time
+- Long continuous PC segments (suspicious)
+
+#### 2. Distance / Speed
+- YM at road speeds → likely misuse
+- YM over long distances (> ~1 mile threshold)
+- PC over long distances
+  - Some statutory limits (Canada)
+  - US: guidance-based, still enforceable via audit
+
+#### 3. Contextual Timing
+- PC near a would-be violation = high risk
+  - End-of-shift PC vs start-of-shift PC
+- PC used to “escape”:
+  - 11-hour driving limit
+  - 14-hour duty window
+  - 30-minute break requirement
+
+#### 4. Counterfactual Impact ("What if this wasn’t PC/YM?")
+- Would this segment have caused:
+  - Driving violation?
+  - Duty violation?
+- Magnitude of avoided violation (minutes over)
+
+---
+
+### Visualization Concepts
+
+#### 1. Risk Heat Map (continuous signal)
+- Tint segments based on risk level
+  - Neutral → clean usage
+  - Amber → questionable
+  - Red → high likelihood misuse
+- Risk accumulates over time (not just per segment)
+
+#### 2. Shadow Timeline (Intent vs Reality)
+- Show “ghost” driving/work hidden by PC/YM
+  - PC:
+    - Actual: rest line
+    - Shadow: driving bar
+  - YM:
+    - Actual: on-duty bar
+    - Shadow: driving bar
+
+#### 3. Risk Triggers (local indicators)
+- Highlight segments where:
+  - PC occurs near violation boundary
+  - YM exceeds speed/distance heuristics
+- Optional: small markers/icons instead of full color shift
+
+#### 4. Hugging line decorator notes for PC/YM
+- Default visual weight for PC/YM should start from absolute influenced duration, not percentage of containing segment
+  - 1–4 min PCs/YMs may form one visual class
+  - 60 min PC should remain visually significant even inside a very large containing segment
+- Percentage of containing segment may still be analytically useful later, but should not drive first-pass display emphasis
+
+
+---
+
+### Derived Metrics (for future use)
+- "Avoided Driving Time" (via PC/YM)
+- "Avoided Violations"
+- "Risk Score" per driver/day/rolling period
+
+---
+
+### Design Notes / Open Questions
+- Should risk be:
+  - visually continuous (heatmap), or
+  - event-based (flags only), or both?
+- How aggressive should heuristics be vs explainability?
+- How to communicate "guidance vs regulation" (US vs Canada)?
+
+---
+
 ## 🧠 Analytical Opportunities
 
 - Highlight **rest quality**, not just violations
@@ -401,6 +496,8 @@ Render as:
 - Should clustering be automatic or user-controlled?  
 - How to visually indicate that clustering has occurred?  
 - Should clusters expand inline or via interaction?  
+- Big idea: open repository of paper logs (images, data) (with our mobile app as default) would be awesome
+
 
 
 ### Very Short Segment Rendering

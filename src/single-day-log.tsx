@@ -12,11 +12,20 @@ type DutyEvent = {
     time: string; // e.g. "00:30:00", "1d00:15:00"
 };
 
+type InfluenceKind = "personalConveyance" | "yardMove";
+
+type SegmentInfluence = {
+    kind: InfluenceKind;
+    seconds: number;
+    riskLevel?: "low" | "medium" | "high";
+};
+
 type Segment = {
     id: string;
     kind: SegmentKind;
     startSecond: number;
     endSecond: number;
+    influences?: SegmentInfluence[];
 };
 
 type RowConfig = {
@@ -150,7 +159,48 @@ function buildSegments(events: DutyEvent[]): Segment[] {
         });
     }
 
-    return segments;
+    return segments.map((segment) => {
+        if (segment.id === "b") {
+            return {
+                ...segment,
+                influences: [
+                    {
+                        kind: "personalConveyance",
+                        seconds: 4 * 60,
+                        riskLevel: "low",
+                    },
+                ],
+            };
+        }
+
+        if (segment.id === "c") {
+            return {
+                ...segment,
+                influences: [
+                    {
+                        kind: "personalConveyance",
+                        seconds: 60 * 60,
+                        riskLevel: "medium",
+                    },
+                ],
+            };
+        }
+
+        if (segment.id === "d") {
+            return {
+                ...segment,
+                influences: [
+                    {
+                        kind: "yardMove",
+                        seconds: 12 * 60,
+                        riskLevel: "low",
+                    },
+                ],
+            };
+        }
+
+        return segment;
+    });
 }
 
 function getDurationSeconds(segment: Segment): number {
@@ -159,6 +209,38 @@ function getDurationSeconds(segment: Segment): number {
 
 function getDurationMinutes(segment: Segment): number {
     return Math.round(getDurationSeconds(segment) / 60);
+}
+
+function getInfluenceThickness(seconds: number): number {
+    const minutes = Math.round(seconds / 60);
+
+    if (minutes <= 0) return 0;
+    if (minutes <= 4) return 1;
+    if (minutes <= 14) return 2;
+    if (minutes <= 29) return 3;
+    if (minutes <= 59) return 4;
+    return 5;
+}
+
+function getInfluenceColor(
+    kind: InfluenceKind,
+    riskLevel: "low" | "medium" | "high" = "low"
+): string {
+    if (kind === "personalConveyance") {
+        if (riskLevel === "high") return "#dc2626";
+        if (riskLevel === "medium") return "#ea580c";
+        return "#ca8a04";
+    }
+
+    if (riskLevel === "high") return "#b45309";
+    if (riskLevel === "medium") return "#d97706";
+    return "#eab308";
+}
+
+function getPrimaryInfluence(segment: Segment): SegmentInfluence | null {
+    if (!segment.influences || segment.influences.length === 0) return null;
+
+    return [...segment.influences].sort((a, b) => b.seconds - a.seconds)[0];
 }
 
 function formatDurationLabelCompact(totalSeconds: number): string {
@@ -397,6 +479,22 @@ function SegmentDetails({ segment }: { segment: Segment | null }) {
                 <div>End: {formatClock(segment.endSecond)}</div>
                 <div>Duration: {formatDurationLabelFull(getDurationSeconds(segment))}</div>
                 <div>Row: {meta.row === "work" ? "Work bar" : "Rest line"}</div>
+                <div>
+                    Influence:{" "}
+                    {segment.influences && segment.influences.length > 0 ? (
+                        segment.influences.map((influence, index) => (
+                            <span key={index}>
+                                {index > 0 ? ", " : ""}
+                                {influence.kind === "personalConveyance"
+                                    ? "Personal Conveyance"
+                                    : "Yard Move"}{" "}
+                                ({formatDurationLabelFull(influence.seconds)})
+                            </span>
+                        ))
+                    ) : (
+                        <span style={{ color: "#94a3b8" }}>None</span>
+                    )}
+                </div>
             </div>
         </div>
     );
@@ -445,6 +543,7 @@ function WorkSegment({
 }) {
     const meta = kindMeta[segment.kind];
     const compactLabel = formatDurationLabelCompact(getDurationSeconds(segment));
+    const influence = getPrimaryInfluence(segment);
 
     return (
         <button
@@ -473,11 +572,30 @@ function WorkSegment({
                     ? "0 0 0 2px rgba(15, 23, 42, 0.25)"
                     : "0 1px 2px rgba(0,0,0,0.10)",
                 whiteSpace: "nowrap",
-                overflow: "hidden",
+                overflow: "visible",
                 textOverflow: "ellipsis",
+                position: "relative",
             }}
         >
             {compactLabel}
+
+            {influence && (
+                <div
+                    style={{
+                        position: "absolute",
+                        left: 0,
+                        right: 0,
+                        bottom: -3,
+                        height: getInfluenceThickness(influence.seconds),
+                        background: getInfluenceColor(
+                            influence.kind,
+                            influence.riskLevel ?? "low"
+                        ),
+                        borderRadius: 9999,
+                        pointerEvents: "none",
+                    }}
+                />
+            )}
         </button>
     );
 }
@@ -497,6 +615,7 @@ function RestSegment({
 }) {
     const meta = kindMeta[segment.kind];
     const compactLabel = formatDurationLabelCompact(getDurationSeconds(segment));
+    const influence = getPrimaryInfluence(segment);
 
     return (
         <button
@@ -513,31 +632,58 @@ function RestSegment({
                 padding: 0,
                 cursor: "pointer",
                 textAlign: "center",
+                overflow: "visible",
             }}
         >
             <div
                 style={{
-                    height: 14,
-                    marginBottom: 4,
-                    fontSize: 11,
-                    fontWeight: 600,
-                    color: "#475569",
-                    whiteSpace: "nowrap",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    textAlign: "center",
-                    lineHeight: "14px",
+                    position: "relative",
+                    width: "100%",
                 }}
             >
-                {compactLabel}
+                {influence && (
+                    <div
+                        style={{
+                            position: "absolute",
+                            left: 0,
+                            right: 0,
+                            bottom: -3,
+                            height: getInfluenceThickness(influence.seconds),
+                            background: getInfluenceColor(
+                                influence.kind,
+                                influence.riskLevel ?? "low"
+                            ),
+                            borderRadius: 9999,
+                            pointerEvents: "none",
+                        }}
+                    />
+                )}
+
+                <div
+                    style={{
+                        height: 14,
+                        marginBottom: 4,
+                        fontSize: 11,
+                        fontWeight: 600,
+                        color: "#475569",
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        textAlign: "center",
+                        lineHeight: "14px",
+                    }}
+                >
+                    {compactLabel}
+                </div>
+
+                <div
+                    style={{
+                        width: "100%",
+                        borderTop: `${active ? 4 : 3}px solid ${meta.restColor}`,
+                        borderRadius: 9999,
+                    }}
+                />
             </div>
-            <div
-                style={{
-                    width: "100%",
-                    borderTop: `${active ? 4 : 3}px solid ${meta.restColor}`,
-                    borderRadius: 9999,
-                }}
-            />
         </button>
     );
 }
