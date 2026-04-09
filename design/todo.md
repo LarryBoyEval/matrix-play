@@ -2,7 +2,7 @@
 
 ## 🔥 Next Up (start here every session)
 - [x] Move 'Next Prompt' from design notebook to formal `todo.md`
-- [ ] Code refactor: target large blocks
+- [x] Code refactor: target large blocks
 
 ---
 
