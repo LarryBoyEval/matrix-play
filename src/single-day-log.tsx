@@ -14,7 +14,14 @@ type DutyEvent = {
 
 type InfluenceKind = "personalConveyance" | "yardMove";
 
-type SegmentInfluence = {
+type InfluenceInterval = {
+    kind: InfluenceKind;
+    startSecond: number;
+    endSecond: number;
+    riskLevel?: "low" | "medium" | "high";
+};
+
+type SegmentInfluenceSummary = {
     kind: InfluenceKind;
     seconds: number;
     riskLevel?: "low" | "medium" | "high";
@@ -25,7 +32,7 @@ type Segment = {
     kind: SegmentKind;
     startSecond: number;
     endSecond: number;
-    influences?: SegmentInfluence[];
+    influenceSummaries?: SegmentInfluenceSummary[];
 };
 
 type RowConfig = {
@@ -45,6 +52,27 @@ const fixtureEvents: DutyEvent[] = [
     { id: "f", kind: "onDuty", time: "19:45:00" },
     { id: "g", kind: "sleeper", time: "23:45:00" },
     { id: "h", kind: "offDuty", time: "1d00:00:00" },
+];
+
+const fixtureInfluences: InfluenceInterval[] = [
+    {
+        kind: "personalConveyance",
+        startSecond: parseFixtureTime("00:34:00"),
+        endSecond: parseFixtureTime("00:38:00"),
+        riskLevel: "low",
+    },
+    {
+        kind: "personalConveyance",
+        startSecond: parseFixtureTime("01:10:00"),
+        endSecond: parseFixtureTime("02:10:00"),
+        riskLevel: "medium",
+    },
+    {
+        kind: "yardMove",
+        startSecond: parseFixtureTime("02:50:00"),
+        endSecond: parseFixtureTime("03:02:00"),
+        riskLevel: "low",
+    },
 ];
 
 const ROW_CONFIG: Record<ParentRow, RowConfig> = {
@@ -144,63 +172,28 @@ function parseFixtureTime(value: string): number {
     return days * 86400 + hours * 3600 + minutes * 60 + seconds;
 }
 
-function buildSegments(events: DutyEvent[]): Segment[] {
+function buildSegments(
+    events: DutyEvent[],
+    influences: InfluenceInterval[]
+): Segment[] {
     const segments: Segment[] = [];
 
     for (let i = 0; i < events.length - 1; i++) {
         const current = events[i];
         const next = events[i + 1];
 
-        segments.push({
+        const segment: Segment = {
             id: current.id,
             kind: current.kind,
             startSecond: parseFixtureTime(current.time),
             endSecond: parseFixtureTime(next.time),
-        });
+        };
+
+        segment.influenceSummaries = getSegmentInfluenceSummaries(segment, influences);
+        segments.push(segment);
     }
 
-    return segments.map((segment) => {
-        if (segment.id === "b") {
-            return {
-                ...segment,
-                influences: [
-                    {
-                        kind: "personalConveyance",
-                        seconds: 4 * 60,
-                        riskLevel: "low",
-                    },
-                ],
-            };
-        }
-
-        if (segment.id === "c") {
-            return {
-                ...segment,
-                influences: [
-                    {
-                        kind: "personalConveyance",
-                        seconds: 60 * 60,
-                        riskLevel: "medium",
-                    },
-                ],
-            };
-        }
-
-        if (segment.id === "d") {
-            return {
-                ...segment,
-                influences: [
-                    {
-                        kind: "yardMove",
-                        seconds: 12 * 60,
-                        riskLevel: "low",
-                    },
-                ],
-            };
-        }
-
-        return segment;
-    });
+    return segments;
 }
 
 function getDurationSeconds(segment: Segment): number {
@@ -237,10 +230,64 @@ function getInfluenceColor(
     return "#eab308";
 }
 
-function getPrimaryInfluence(segment: Segment): SegmentInfluence | null {
-    if (!segment.influences || segment.influences.length === 0) return null;
+function getOverlapSeconds(
+    startA: number,
+    endA: number,
+    startB: number,
+    endB: number
+): number {
+    const start = Math.max(startA, startB);
+    const end = Math.min(endA, endB);
+    return Math.max(0, end - start);
+}
 
-    return [...segment.influences].sort((a, b) => b.seconds - a.seconds)[0];
+function getPrimaryInfluence(segment: Segment): SegmentInfluenceSummary | null {
+    if (!segment.influenceSummaries || segment.influenceSummaries.length === 0) return null;
+
+    return [...segment.influenceSummaries].sort((a, b) => b.seconds - a.seconds)[0];
+}
+
+function getSegmentInfluenceSummaries(
+    segment: Segment,
+    influences: InfluenceInterval[]
+): SegmentInfluenceSummary[] {
+    const totals = new Map<InfluenceKind, { seconds: number; riskLevel?: "low" | "medium" | "high" }>();
+
+    for (const influence of influences) {
+        const overlap = getOverlapSeconds(
+            segment.startSecond,
+            segment.endSecond,
+            influence.startSecond,
+            influence.endSecond
+        );
+
+        if (overlap <= 0) continue;
+
+        const existing = totals.get(influence.kind);
+
+        if (existing) {
+            existing.seconds += overlap;
+
+            if (
+                influence.riskLevel === "high" ||
+                (influence.riskLevel === "medium" && existing.riskLevel === "low") ||
+                !existing.riskLevel
+            ) {
+                existing.riskLevel = influence.riskLevel;
+            }
+        } else {
+            totals.set(influence.kind, {
+                seconds: overlap,
+                riskLevel: influence.riskLevel,
+            });
+        }
+    }
+
+    return Array.from(totals.entries()).map(([kind, value]) => ({
+        kind,
+        seconds: value.seconds,
+        riskLevel: value.riskLevel,
+    }));
 }
 
 function formatDurationLabelCompact(totalSeconds: number): string {
@@ -481,8 +528,8 @@ function SegmentDetails({ segment }: { segment: Segment | null }) {
                 <div>Row: {meta.row === "work" ? "Work bar" : "Rest line"}</div>
                 <div>
                     Influence:{" "}
-                    {segment.influences && segment.influences.length > 0 ? (
-                        segment.influences.map((influence, index) => (
+                    {segment.influenceSummaries && segment.influenceSummaries.length > 0 ? (
+                        segment.influenceSummaries.map((influence, index) => (
                             <span key={index}>
                                 {index > 0 ? ", " : ""}
                                 {influence.kind === "personalConveyance"
@@ -901,7 +948,10 @@ export default function SingleDayLog() {
     const [mode, setMode] = useState<DisplayMode>("compressed");
     const [rowMode, setRowMode] = useState<RowMode>("2-row");
 
-    const segments = useMemo(() => buildSegments(fixtureEvents), []);
+    const segments = useMemo(
+        () => buildSegments(fixtureEvents, fixtureInfluences),
+        []
+    );
     const [activeId, setActiveId] = useState<string | null>(segments[0]?.id ?? null);
 
     const compressedWidths = useMemo(() => getCompressedWidths(segments), [segments]);
