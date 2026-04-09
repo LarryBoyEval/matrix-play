@@ -438,15 +438,3 @@ Guiding rule:
 
 ---
 
-## ▶️ Next Session Prompt
-- Allow four-row display (Rest-> OffDuty/Sleeper rows; Work-> Driving/On-Duty Rows)
-- Prototype sleeper split highlighting
-- Evaluate rest visibility vs minimalism tradeoff
-
-### Recently completed (most recent on top)
-- Timeline ticks slightly off from timebars - margin? (complete)
-- Put rest on time, work on bottom visually (complete)
-- Switch to timestamp-based fixtures (complete)
-- Explore compressed mode rendering rules (complete)
-- Pressure-test bars vs lines model with real driver day (complete)
-
