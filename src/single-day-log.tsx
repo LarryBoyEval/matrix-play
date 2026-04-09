@@ -27,6 +27,16 @@ type SegmentInfluenceSummary = {
     riskLevel?: "low" | "medium" | "high";
 };
 
+type SegmentInfluenceSlice = {
+    kind: InfluenceKind;
+    riskLevel?: "low" | "medium" | "high";
+    startSecond: number;
+    endSecond: number;
+    overlapStartSecond: number;
+    overlapEndSecond: number;
+    overlapSeconds: number;
+};
+
 type Segment = {
     id: string;
     kind: SegmentKind;
@@ -288,6 +298,33 @@ function getSegmentInfluenceSummaries(
         seconds: value.seconds,
         riskLevel: value.riskLevel,
     }));
+}
+
+function getSegmentInfluenceSlices(
+    segment: Segment,
+    influences: InfluenceInterval[]
+): SegmentInfluenceSlice[] {
+    const slices: SegmentInfluenceSlice[] = [];
+
+    for (const influence of influences) {
+        const overlapStartSecond = Math.max(segment.startSecond, influence.startSecond);
+        const overlapEndSecond = Math.min(segment.endSecond, influence.endSecond);
+        const overlapSeconds = Math.max(0, overlapEndSecond - overlapStartSecond);
+
+        if (overlapSeconds <= 0) continue;
+
+        slices.push({
+            kind: influence.kind,
+            riskLevel: influence.riskLevel,
+            startSecond: influence.startSecond,
+            endSecond: influence.endSecond,
+            overlapStartSecond,
+            overlapEndSecond,
+            overlapSeconds,
+        });
+    }
+
+    return slices;
 }
 
 function formatDurationLabelCompact(totalSeconds: number): string {
@@ -575,16 +612,60 @@ function ToolbarButton({
     );
 }
 
+function ProportionalInfluenceOverlay({
+    segment,
+    influences,
+}: {
+    segment: Segment;
+    influences: InfluenceInterval[];
+}) {
+    const segmentDuration = getDurationSeconds(segment);
+    const slices = getSegmentInfluenceSlices(segment, influences);
+
+    if (segmentDuration <= 0 || slices.length === 0) return null;
+
+    return (
+        <>
+            {slices.map((slice, index) => {
+                const leftPct =
+                    ((slice.overlapStartSecond - segment.startSecond) / segmentDuration) * 100;
+                const widthPct = (slice.overlapSeconds / segmentDuration) * 100;
+
+                return (
+                    <div
+                        key={`${slice.kind}-${slice.overlapStartSecond}-${slice.overlapEndSecond}-${index}`}
+                        style={{
+                            position: "absolute",
+                            left: `${leftPct}%`,
+                            width: `${widthPct}%`,
+                            bottom: -3,
+                            height: getInfluenceThickness(slice.overlapSeconds),
+                            background: getInfluenceColor(
+                                slice.kind,
+                                slice.riskLevel ?? "low"
+                            ),
+                            borderRadius: 9999,
+                            pointerEvents: "none",
+                        }}
+                    />
+                );
+            })}
+        </>
+    );
+}
+
 function WorkSegment({
     segment,
     width,
     widthMode,
+    influences,
     active,
     onActivate,
 }: {
     segment: Segment;
     width: number;
     widthMode: DisplayMode;
+    influences: InfluenceInterval[];
     active: boolean;
     onActivate: () => void;
 }) {
@@ -626,22 +707,29 @@ function WorkSegment({
         >
             {compactLabel}
 
-            {influence && (
-                <div
-                    style={{
-                        position: "absolute",
-                        left: 0,
-                        right: 0,
-                        bottom: -3,
-                        height: getInfluenceThickness(influence.seconds),
-                        background: getInfluenceColor(
-                            influence.kind,
-                            influence.riskLevel ?? "low"
-                        ),
-                        borderRadius: 9999,
-                        pointerEvents: "none",
-                    }}
+            {widthMode === "proportional" ? (
+                <ProportionalInfluenceOverlay
+                    segment={segment}
+                    influences={influences}
                 />
+            ) : (
+                influence && (
+                    <div
+                        style={{
+                            position: "absolute",
+                            left: 0,
+                            right: 0,
+                            bottom: -3,
+                            height: getInfluenceThickness(influence.seconds),
+                            background: getInfluenceColor(
+                                influence.kind,
+                                influence.riskLevel ?? "low"
+                            ),
+                            borderRadius: 9999,
+                            pointerEvents: "none",
+                        }}
+                    />
+                )
             )}
         </button>
     );
@@ -651,12 +739,14 @@ function RestSegment({
     segment,
     width,
     widthMode,
+    influences,
     active,
     onActivate,
 }: {
     segment: Segment;
     width: number;
     widthMode: DisplayMode;
+    influences: InfluenceInterval[];
     active: boolean;
     onActivate: () => void;
 }) {
@@ -688,22 +778,29 @@ function RestSegment({
                     width: "100%",
                 }}
             >
-                {influence && (
-                    <div
-                        style={{
-                            position: "absolute",
-                            left: 0,
-                            right: 0,
-                            bottom: -3,
-                            height: getInfluenceThickness(influence.seconds),
-                            background: getInfluenceColor(
-                                influence.kind,
-                                influence.riskLevel ?? "low"
-                            ),
-                            borderRadius: 9999,
-                            pointerEvents: "none",
-                        }}
+                {widthMode === "proportional" ? (
+                    <ProportionalInfluenceOverlay
+                        segment={segment}
+                        influences={influences}
                     />
+                ) : (
+                    influence && (
+                        <div
+                            style={{
+                                position: "absolute",
+                                left: 0,
+                                right: 0,
+                                bottom: -3,
+                                height: getInfluenceThickness(influence.seconds),
+                                background: getInfluenceColor(
+                                    influence.kind,
+                                    influence.riskLevel ?? "low"
+                                ),
+                                borderRadius: 9999,
+                                pointerEvents: "none",
+                            }}
+                        />
+                    )
                 )}
 
                 <div
@@ -809,6 +906,7 @@ function TimelineRowGroup({
     rowMode,
     mode,
     segments,
+    influences,
     compressedWidths,
     activeId,
     onActivate,
@@ -817,6 +915,7 @@ function TimelineRowGroup({
     rowMode: RowMode;
     mode: DisplayMode;
     segments: Segment[];
+    influences: InfluenceInterval[];
     compressedWidths: Record<string, number>;
     activeId: string | null;
     onActivate: (id: string) => void;
@@ -869,6 +968,7 @@ function TimelineRowGroup({
                                                 : compressedWidth
                                         }
                                         widthMode={mode}
+                                        influences={influences}
                                         active={activeId === segment.id}
                                         onActivate={() => onActivate(segment.id)}
                                     />
@@ -885,6 +985,7 @@ function TimelineRowGroup({
                                             : compressedWidth
                                     }
                                     widthMode={mode}
+                                    influences={influences}
                                     active={activeId === segment.id}
                                     onActivate={() => onActivate(segment.id)}
                                 />
@@ -909,6 +1010,7 @@ function TimelineSection({
     rowMode,
     mode,
     segments,
+    influences,
     compressedWidths,
     activeId,
     onActivate,
@@ -917,6 +1019,7 @@ function TimelineSection({
     rowMode: RowMode;
     mode: DisplayMode;
     segments: Segment[];
+    influences: InfluenceInterval[];
     compressedWidths: Record<string, number>;
     activeId: string | null;
     onActivate: (id: string) => void;
@@ -936,6 +1039,7 @@ function TimelineSection({
                 rowMode={rowMode}
                 mode={mode}
                 segments={segments}
+                influences={influences}
                 compressedWidths={compressedWidths}
                 activeId={activeId}
                 onActivate={onActivate}
@@ -1063,6 +1167,7 @@ export default function SingleDayLog() {
                         rowMode={rowMode}
                         mode={mode}
                         segments={segments}
+                        influences={fixtureInfluences}
                         compressedWidths={compressedWidths}
                         activeId={activeId}
                         onActivate={setActiveId}
@@ -1073,6 +1178,7 @@ export default function SingleDayLog() {
                         rowMode={rowMode}
                         mode={mode}
                         segments={segments}
+                        influences={fixtureInfluences}
                         compressedWidths={compressedWidths}
                         activeId={activeId}
                         onActivate={setActiveId}
