@@ -54,9 +54,9 @@ const TRACK_X_PADDING = 8;
 const ROW_LABEL_COLUMN_WIDTH = 120;
 
 const fixtureEvents: DutyEvent[] = [
-    { id: "a", kind: "sleeper", time: "00:00:00" },
-    { id: "b", kind: "offDuty", time: "00:30:00" },
-    { id: "c", kind: "sleeper", time: "01:00:00" },
+    { id: "a", kind: "offDuty", time: "00:00:00" },
+    { id: "b", kind: "sleeper", time: "00:30:00" },
+    { id: "c", kind: "offDuty", time: "01:00:00" },
     { id: "d", kind: "onDuty", time: "02:45:00" },
     { id: "e", kind: "driving", time: "09:45:00" },
     { id: "f", kind: "onDuty", time: "19:45:00" },
@@ -67,15 +67,15 @@ const fixtureEvents: DutyEvent[] = [
 const fixtureInfluences: InfluenceInterval[] = [
     {
         kind: "personalConveyance",
-        startSecond: parseFixtureTime("00:34:00"),
-        endSecond: parseFixtureTime("00:38:00"),
+        startSecond: parseFixtureTime("00:14:00"),
+        endSecond: parseFixtureTime("00:18:00"),
         riskLevel: "low",
     },
     {
         kind: "personalConveyance",
         startSecond: parseFixtureTime("01:10:00"),
         endSecond: parseFixtureTime("02:10:00"),
-        riskLevel: "medium",
+        riskLevel: "high",
     },
     {
         kind: "yardMove",
@@ -238,6 +238,21 @@ function getInfluenceColor(
     if (riskLevel === "high") return "#b45309";
     if (riskLevel === "medium") return "#d97706";
     return "#eab308";
+}
+
+function getCounterfactualTraceColor(
+    kind: InfluenceKind,
+    riskLevel: "low" | "medium" | "high" = "low"
+): string {
+    if (kind === "personalConveyance") {
+        if (riskLevel === "high") return "#8f6d4f";
+        if (riskLevel === "medium") return "#a88b6d";
+        return "#b7a28a";
+    }
+
+    if (riskLevel === "high") return "#7b6753";
+    if (riskLevel === "medium") return "#93826d";
+    return "#a79b8a";
 }
 
 function getOverlapSeconds(
@@ -654,6 +669,48 @@ function ProportionalInfluenceOverlay({
     );
 }
 
+function DrivingRowCounterfactualOverlay({
+    influences,
+}: {
+    influences: InfluenceInterval[];
+}) {
+    return (
+        <div
+            style={{
+                position: "absolute",
+                inset: 0,
+                pointerEvents: "none",
+            }}
+        >
+            {influences.map((influence, index) => {
+                const leftPct = (influence.startSecond / 86400) * 100;
+                const widthPct =
+                    ((influence.endSecond - influence.startSecond) / 86400) * 100;
+
+                return (
+                    <div
+                        key={`${influence.kind}-${influence.startSecond}-${influence.endSecond}-${index}`}
+                        style={{
+                            position: "absolute",
+                            left: `${leftPct}%`,
+                            width: `${widthPct}%`,
+                            top: "50%",
+                            transform: "translateY(-50%)",
+                            height: 1,
+                            background: getCounterfactualTraceColor(
+                                influence.kind,
+                                influence.riskLevel ?? "low"
+                            ),
+                            borderRadius: 9999,
+                            opacity: 0.40,
+                        }}
+                    />
+                );
+            })}
+        </div>
+    );
+}
+
 function WorkSegment({
     segment,
     width,
@@ -943,13 +1000,21 @@ function TimelineRowGroup({
                 <div
                     key={subRow.key}
                     style={{
+                        position: "relative",
                         display: "flex",
                         alignItems: isRestParent ? "center" : "flex-end",
                         gap: mode === "proportional" ? 0 : 4,
                         minHeight: rowMode === "2-row" ? 40 : 18,
                         height: "100%",
+                        overflow: "visible",
                     }}
                 >
+                    {mode === "proportional" &&
+                        rowMode === "4-row" &&
+                        subRow.key === "driving" && (
+                            <DrivingRowCounterfactualOverlay influences={influences} />
+                        )}
+
                     {segments.map((segment) => {
                         const { proportionalWidth, compressedWidth } = getSegmentWidths(
                             segment,

@@ -2,18 +2,13 @@
 
 ## 🔥 Next Up (start here every session)
 
-### Notation Prototypes
-- [ ] Prototype Personal Conveyance notation
-- [ ] Prototype Yard Move notation
-
----
-
-## ⚡ Active Work
-
 ### Driving / Duty Limits
 - [ ] Prototype driving, shift, on-duty, and multi-day limits
   - Include stacking (earliest-on-top)
   - Consider overlay vs grouped visual model
+
+
+## ⚡ Active Work
 
 ### Compressed Mode
 - [ ] Prototype compressed 'noisy/dense' driving/on-duty segments
@@ -81,6 +76,11 @@
 ---
 
 ## ✅ Recently Completed (most recent first)
+
+### Notation Prototypes
+- [x] Prototype Personal Conveyance notation
+- [x] Prototype Yard Move notation
+### Older
 - [x] Setup GitHub repo `matrix-play` and commit code
 - [x] Add four-row display (Rest → Off Duty/Sleeper; Work → Driving/On Duty)
 - [x] Fix timeline tick alignment (margin issue)
@@ -93,13 +93,17 @@
 
 ## 🧪 Session Notes
 
-### 2026-04-08
-- Initialized repo and first commit
-
 ### 2026-04-09 
+6:24p
+- PC/YM notations under off-duty and on-duty
+- Driving row 'shadows' showing driving time that was suppressed
 10:33a
 - Established TODO workflow
 - Identified need for timezone abstraction
 11:14a
 - [x] Move 'Next Prompt' from design notebook to formal `todo.md`
 - [x] Code refactor: target large blocks
+
+### 2026-04-08
+- Initialized repo and first commit
+
