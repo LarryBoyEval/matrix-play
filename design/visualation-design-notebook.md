@@ -372,6 +372,28 @@ Core assumption for this visualization system:
 
 ---
 
+## Grid Background
+
+### Timeline orientation
+- Hour markers/orientation likely necessary due to frequency of reference to general start/stop times
+- Keep to minimal ink principle
+- Knock-out lines 1px along grid background
+- Something more subtle, possibly at 1/2 hour increment
+
+### Day indicators
+- Day and Month/Day depending on reference
+- Year can always be implied with 6-month lookback
+  - Hover/select for year if we do go back further (forensics)
+- Separate indicator for end-of-day (EOD) totals
+- Indicate day-type: ELD log, paper log, paper timecard, missing logs/no data. ELD timecard might be special.
+  - ELD provider?
+  - Day distance
+  - Home terminal? Timezone? Start-time (noon-to-noon, 6a, etc.)
+  - Paper indicators gateway to paper form viewing?
+  - TImezone
+
+---
+
 ## 🧠 Analytical Opportunities
 
 - Highlight **rest quality**, not just violations

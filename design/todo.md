@@ -3,9 +3,22 @@
 ## 🔥 Next Up (start here every session)
 
 ### Driving / Duty Limits
-- [ ] Prototype driving, shift, on-duty, and multi-day limits
-  - Include stacking (earliest-on-top)
-  - Consider overlay vs grouped visual model
+- [x] Prototype driving, shift, on-duty, and multi-day limits
+  - [x] Include stacking (earliest-on-top)
+  - [x] Consider overlay vs grouped visual model: note: border colors with horizontal offsets allow expert violation
+        category detection
+  - [x] Rough out some icons, test vs. text. (Text wins)
+  - [x] Consider half-pill vs. octagon/stop sign shaps. (Octagons win)
+  - [x] Signal when in-violation (fill red; keep border colored by by violation category)
+  - [x] Fade violation categories .. futher distance = less opacity
+  - [ ] Implement time-based positioning
+
+### Background
+- [x] One hour hash marks
+- [-] Maybe: half-hour hash marks
+- [ ] Highlight section of grid with gently transparent color
+- [ ] Experiment 3-4 stacked highlights or toggling
+
 
 
 ## ⚡ Active Work
@@ -26,7 +39,7 @@
 ---
 
 ## 📅 Multi-Day Scrollable Region
-- [ ] Show 7-day side-scrolling timebar
+- [ ] Show 7- to 14-day side-scrolling timebar
 - [ ] Set origin timestamp
 - [ ] Set origin timezone
 
@@ -42,14 +55,14 @@
 
 ### Timezone Handling
 - [ ] Display timezone
-- [ ] Add manual timezone override
+- [ ] Add manual timezone override ... common US/Canada plus UTC
 - [ ] Add quick programmatic timezone override
   - Example: hover over TZ buttons (future use: cross-timezone documents)
 
 ---
 
 ## 🌎 Jurisdictions
-- [ ]
+- [ ] Timebar with flags?
 
 ---
 
@@ -92,6 +105,13 @@
 ---
 
 ## 🧪 Session Notes
+
+### 2026-04-16
+4:56p
+- Drawing one hour guidelines on grid
+- Changed times to be one hour with brief pm indicators
+11:00a-ish
+- Completed first pass (multiday project) of ViolationCap component: shows where violations start on timeline
 
 ### 2026-04-09 
 6:24p

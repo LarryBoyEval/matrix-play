@@ -402,6 +402,35 @@ function getCompressedWidths(segments: Segment[]): Record<string, number> {
     );
 }
 
+function getProportionalHourGridBackground(): string {
+    return `
+        repeating-linear-gradient(
+            to right,
+            transparent 0,
+            transparent calc((100% / 24) - 1px),
+            rgba(15, 23, 42, 0.08) calc((100% / 24) - 1px),
+            rgba(15, 23, 42, 0.08) calc(100% / 24)
+        )
+    `;
+}
+
+function GroupHourGridOverlay() {
+    return (
+        <div
+            aria-hidden="true"
+            style={{
+                position: "absolute",
+                inset: 0,
+                backgroundImage: getProportionalHourGridBackground(),
+                backgroundRepeat: "repeat",
+                backgroundSize: "100% 100%",
+                pointerEvents: "none",
+                borderRadius: 16,
+            }}
+        />
+    );
+}
+
 function getSegmentWidths(
     segment: Segment,
     compressedWidths: Record<string, number>
@@ -446,7 +475,24 @@ function renderSpacer(
 }
 
 function Axis() {
-    const ticks = Array.from({ length: 13 }, (_, i) => i * 2);
+    const ticks = Array.from({ length: 25 }, (_, i) => i);
+
+    function formatHourLabel(hour: number): string {
+        if (hour === 0 || hour === 24) return "12a";
+        if (hour === 12) return "N";
+
+        // PM hours with suffix (1p–9p)
+        if (hour >= 13 && hour <= 21) return `${hour - 12}p`;
+
+        // Late evening without suffix
+        if (hour === 22) return "10";
+        if (hour === 23) return "11";
+
+        // Morning hours (no 'a')
+        if (hour >= 1 && hour <= 11) return `${hour}`;
+
+        return "";
+    }
 
     return (
         <div
@@ -491,9 +537,10 @@ function Axis() {
                                 color: "#64748b",
                                 whiteSpace: "nowrap",
                                 textAlign: "center",
+                                minWidth: 16,
                             }}
                         >
-                            {hour}
+                            {formatHourLabel(hour)}
                         </div>
                     </div>
                 ))}
@@ -995,8 +1042,39 @@ function TimelineRowGroup({
                 display: "grid",
                 gridTemplateRows: rowMode === "2-row" ? "1fr" : "1fr 1fr",
                 gap: rowMode === "2-row" ? 0 : 8,
+                position: "relative",
+                overflow: "hidden",
             }}
         >
+            {mode === "proportional" && (
+                <div
+                    aria-hidden="true"
+                    style={{
+                        position: "absolute",
+                        inset: `12px ${TRACK_X_PADDING}px`,
+                        backgroundImage: `
+                            linear-gradient(
+                                to right,
+                                rgba(15, 23, 42, 0.06) 0px,
+                                rgba(15, 23, 42, 0.06) 1px,
+                                transparent 1px
+                            ),
+                            repeating-linear-gradient(
+                                to right,
+                                transparent 0,
+                                transparent calc((100% / 24) - 1px),
+                                rgba(15, 23, 42, 0.06) calc((100% / 24) - 1px),
+                                rgba(15, 23, 42, 0.06) calc(100% / 24)
+                            )
+                        `,
+                        backgroundRepeat: "repeat",
+                        backgroundSize: "100% 100%",
+                        pointerEvents: "none",
+                        zIndex: 0,
+                    }}
+                />
+            )}
+
             {subRows.map((subRow) => (
                 <div
                     key={subRow.key}
@@ -1008,6 +1086,7 @@ function TimelineRowGroup({
                         minHeight: rowMode === "2-row" ? 40 : 18,
                         height: "100%",
                         overflow: "visible",
+                        zIndex: 1,
                     }}
                 >
                     {mode === "proportional" &&
@@ -1074,7 +1153,7 @@ function TimelineRowGroup({
                                     type="break"
                                     shape="octagon"
                                     displayMode="number"
-                                    urgency="triggered" //triggered
+                                    urgency="triggered"
                                     left={675}
                                     top={2}
                                 />
@@ -1083,7 +1162,7 @@ function TimelineRowGroup({
                                     type="driving"
                                     shape="octagon"
                                     displayMode="number"
-                                    urgency="imminent" //imminent
+                                    urgency="imminent"
                                     left={735}
                                     top={2}
                                 />
@@ -1092,7 +1171,7 @@ function TimelineRowGroup({
                                     type="shift"
                                     shape="octagon"
                                     displayMode="number"
-                                    urgency="near" //near
+                                    urgency="near"
                                     left={775}
                                     top={2}
                                 />
@@ -1101,7 +1180,7 @@ function TimelineRowGroup({
                                     type="onduty"
                                     shape="octagon"
                                     displayMode="number"
-                                    urgency="watch" //watch
+                                    urgency="watch"
                                     left={800}
                                     top={2}
                                 />
@@ -1110,7 +1189,7 @@ function TimelineRowGroup({
                                     type="cycle"
                                     shape="octagon"
                                     displayMode="number"
-                                    urgency="distant" //distant
+                                    urgency="distant"
                                     left={825}
                                     top={2}
                                 />
