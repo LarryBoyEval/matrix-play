@@ -1,0 +1,125 @@
+.glyph-sm {
+  width: 13px;
+  height: 13px;
+  display: block;
+  pointer-events: none;
+  z-index: 20;
+}
+
+.violation-cap {
+  --violation-edge-color: #7dd3fc;
+
+  position: absolute;
+  display: inline-flex;
+  align-items: stretch;
+  justify-content: stretch;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  background: var(--violation-edge-color);  /* border color lives here */
+  cursor: pointer;
+  overflow: hidden;
+  user-select: none;
+}
+
+.violation-cap__content {
+  position: absolute;
+  inset: 1px;              /* try 1px first */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+  clip-path: polygon(
+    30% 0%,
+    70% 0%,
+    100% 30%,
+    100% 70%,
+    70% 100%,
+    30% 100%,
+    0% 70%,
+    0% 30%
+  );
+  box-sizing: border-box;
+}
+
+.violation-cap__text {
+  font-size: 10px;
+  line-height: 1;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+/* Shapes */
+
+.violation-cap--octagon {
+  clip-path: polygon(
+    30% 0%,
+    70% 0%,
+    100% 30%,
+    100% 70%,
+    70% 100%,
+    30% 100%,
+    0% 70%,
+    0% 30%
+  );
+}
+
+.violation-cap--half-pill {
+  border-top-right-radius: 999px;
+  border-bottom-right-radius: 999px;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+/* Urgency states: fill color on content, transparency on whole cap */
+
+.violation-cap--distant {
+  opacity: 0.20;
+}
+
+.violation-cap--watch {
+  opacity: 0.4;
+}
+
+.violation-cap--near {
+  opacity: 0.65;
+}
+
+.violation-cap--imminent {
+  opacity: 1;
+}
+
+.violation-cap--triggered {
+  opacity: 1;
+}
+
+.violation-cap--distant .violation-cap__content,
+.violation-cap--watch .violation-cap__content,
+.violation-cap--near .violation-cap__content,
+.violation-cap--imminent .violation-cap__content {
+
+/*  background: #288c46;*/
+  color: #ffffff;
+}
+
+
+.violation-cap--triggered .violation-cap__content {
+  background: #dc1e1e;
+  color: #ffffff;
+}
+
+
+/* Interaction / tuning */
+
+.violation-cap--dimmed {
+  opacity: 0.55;
+}
+
+.violation-cap--selected {
+  transform: translateY(-1px);
+}
+
+.violation-cap:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.8);
+  outline-offset: 1px;
+}

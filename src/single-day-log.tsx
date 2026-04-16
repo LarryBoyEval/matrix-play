@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import ViolationCap from "./ViolationCap";
 
 type SegmentKind = "driving" | "onDuty" | "sleeper" | "offDuty";
 type DisplayMode = "compressed" | "proportional";
@@ -1064,6 +1065,57 @@ function TimelineRowGroup({
                             mode
                         );
                     })}
+
+                    {parent === "work" &&
+                        ((rowMode === "2-row" && subRow.key === "work") ||
+                            (rowMode === "4-row" && subRow.key === "driving")) && (
+                            <>
+                                <ViolationCap
+                                    type="break"
+                                    shape="octagon"
+                                    displayMode="number"
+                                    urgency="triggered" //triggered
+                                    left={675}
+                                    top={2}
+                                />
+
+                                <ViolationCap
+                                    type="driving"
+                                    shape="octagon"
+                                    displayMode="number"
+                                    urgency="imminent" //imminent
+                                    left={735}
+                                    top={2}
+                                />
+
+                                <ViolationCap
+                                    type="shift"
+                                    shape="octagon"
+                                    displayMode="number"
+                                    urgency="near" //near
+                                    left={775}
+                                    top={2}
+                                />
+
+                                <ViolationCap
+                                    type="onduty"
+                                    shape="octagon"
+                                    displayMode="number"
+                                    urgency="watch" //watch
+                                    left={800}
+                                    top={2}
+                                />
+
+                                <ViolationCap
+                                    type="cycle"
+                                    shape="octagon"
+                                    displayMode="number"
+                                    urgency="distant" //distant
+                                    left={825}
+                                    top={2}
+                                />
+                            </>
+                        )}
                 </div>
             ))}
         </div>
@@ -1195,7 +1247,7 @@ export default function SingleDayLog() {
                                     color: "#64748b",
                                 }}
                             >
-                                Mock data only. Good enough to prove draw mechanics..
+                                Mock data only. Good enough to prove draw mechanics.
                             </p>
                         </div>
 
