@@ -1312,6 +1312,7 @@ function TimelineSection({
 export default function SingleDayLog() {
     const [mode, setMode] = useState<DisplayMode>("compressed");
     const [rowMode, setRowMode] = useState<RowMode>("2-row");
+    const [showHighlights, setShowHighlights] = useState(true);
 
     const segments = useMemo(
         () => buildSegments(fixtureEvents, fixtureInfluences),
@@ -1401,6 +1402,14 @@ export default function SingleDayLog() {
 
                         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                             <ToolbarButton
+                                active={showHighlights}
+                                onClick={() => setShowHighlights((value) => !value)}
+                            >
+                                <span style={{ opacity: mode === "proportional" ? 1 : 0.5 }}>
+                                    Highlights
+                                </span>
+                            </ToolbarButton>
+                            <ToolbarButton
                                 active={mode === "compressed"}
                                 onClick={() => setMode("compressed")}
                             >
@@ -1433,7 +1442,7 @@ export default function SingleDayLog() {
                         mode={mode}
                         segments={segments}
                         influences={fixtureInfluences}
-                        highlights={highlights}
+                        highlights={showHighlights ? highlights : []}
                         compressedWidths={compressedWidths}
                         activeId={activeId}
                         onActivate={setActiveId}
@@ -1445,7 +1454,7 @@ export default function SingleDayLog() {
                         mode={mode}
                         segments={segments}
                         influences={fixtureInfluences}
-                        highlights={highlights}
+                        highlights={showHighlights ? highlights : []}
                         compressedWidths={compressedWidths}
                         activeId={activeId}
                         onActivate={setActiveId}

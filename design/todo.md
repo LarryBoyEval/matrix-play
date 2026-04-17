@@ -2,10 +2,9 @@
 
 ## 🔥 Next Up (start here every session)
 
+
 ### Driving / Duty Limits
   - [ ] Implement time-based positioning
-
-
 
 
 ## ⚡ Active Work
@@ -78,6 +77,7 @@
 ## ✅ Recently Completed (most recent first)
 
 ### Background
+- [x] Add toggle button for highlighter - show when highlights are active (active on/off) and when button is valid (dim)
 - [x] One hour hash marks
 - [x] Highlight section of grid with gently transparent color
 - [x] Experiment 3-4 stacked highlights or toggling (stacking works well; better with same color)
@@ -108,6 +108,8 @@
 ---
 
 ## 🧪 Session Notes
+6:33p
+- Added toggle buttle for highlights on/off
 
 ### 2026-04-16
 6:17p
