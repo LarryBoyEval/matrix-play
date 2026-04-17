@@ -51,6 +51,20 @@ type RowConfig = {
     subRows: Array<{ key: SubRowKey; label?: string }>;
 };
 
+type GridHighlightInput = {
+    start: string; // e.g. "09:30:00", "1d02:00:00"
+    end: string;
+    color: string;
+    opacity: number;
+};
+
+type GridHighlight = {
+    startSecond: number;
+    endSecond: number;
+    color: string;
+    opacity: number;
+};
+
 const TRACK_X_PADDING = 8;
 const ROW_LABEL_COLUMN_WIDTH = 120;
 
@@ -83,6 +97,27 @@ const fixtureInfluences: InfluenceInterval[] = [
         startSecond: parseFixtureTime("02:50:00"),
         endSecond: parseFixtureTime("03:02:00"),
         riskLevel: "low",
+    },
+];
+
+const fixtureGridHighlightInputs: GridHighlightInput[] = [
+    {
+        start: "01:30:00",
+        end: "05:00:00",
+        color: "#f59e0b", //0ea5e9
+        opacity: 0.08,
+    },
+    {
+        start: "03:00:00",
+        end: "06:15:00",
+        color: "#f59e0b", //f59e0b
+        opacity: 0.08,
+    },
+    {
+        start: "18:00:00",
+        end: "22:30:00",
+        color: "#ef4444", //ef4444
+        opacity: 0.08,
     },
 ];
 
@@ -205,6 +240,58 @@ function buildSegments(
     }
 
     return segments;
+}
+
+function buildGridHighlights(inputs: GridHighlightInput[]): GridHighlight[] {
+    return inputs.map((highlight) => ({
+        startSecond: parseFixtureTime(highlight.start),
+        endSecond: parseFixtureTime(highlight.end),
+        color: highlight.color,
+        opacity: highlight.opacity,
+    }));
+}
+
+function clampDayPercent(second: number): number {
+    return Math.max(0, Math.min(100, (second / 86400) * 100));
+}
+
+function GridHighlightsOverlay({
+    highlights,
+}: {
+    highlights: GridHighlight[];
+}) {
+    return (
+        <div
+            aria-hidden="true"
+            style={{
+                position: "absolute",
+                inset: 0,
+                pointerEvents: "none",
+                zIndex: 0,
+            }}
+        >
+            {highlights.map((highlight, index) => {
+                const left = clampDayPercent(highlight.startSecond);
+                const right = clampDayPercent(highlight.endSecond);
+                const width = Math.max(0, right - left);
+
+                return (
+                    <div
+                        key={`${highlight.startSecond}-${highlight.endSecond}-${highlight.color}-${index}`}
+                        style={{
+                            position: "absolute",
+                            left: `${left}%`,
+                            width: `${width}%`,
+                            top: 0,
+                            bottom: 0,
+                            background: highlight.color,
+                            opacity: highlight.opacity,
+                        }}
+                    />
+                );
+            })}
+        </div>
+    );
 }
 
 function getDurationSeconds(segment: Segment): number {
@@ -399,35 +486,6 @@ function getCompressedWidths(segments: Segment[]): Record<string, number> {
             const widthPx = estimateLabelWidth(label) + getTierPadding(minutes);
             return [segment.id, widthPx];
         })
-    );
-}
-
-function getProportionalHourGridBackground(): string {
-    return `
-        repeating-linear-gradient(
-            to right,
-            transparent 0,
-            transparent calc((100% / 24) - 1px),
-            rgba(15, 23, 42, 0.08) calc((100% / 24) - 1px),
-            rgba(15, 23, 42, 0.08) calc(100% / 24)
-        )
-    `;
-}
-
-function GroupHourGridOverlay() {
-    return (
-        <div
-            aria-hidden="true"
-            style={{
-                position: "absolute",
-                inset: 0,
-                backgroundImage: getProportionalHourGridBackground(),
-                backgroundRepeat: "repeat",
-                backgroundSize: "100% 100%",
-                pointerEvents: "none",
-                borderRadius: 16,
-            }}
-        />
     );
 }
 
@@ -1012,6 +1070,7 @@ function TimelineRowGroup({
     mode,
     segments,
     influences,
+    highlights,
     compressedWidths,
     activeId,
     onActivate,
@@ -1021,6 +1080,7 @@ function TimelineRowGroup({
     mode: DisplayMode;
     segments: Segment[];
     influences: InfluenceInterval[];
+    highlights: GridHighlight[];
     compressedWidths: Record<string, number>;
     activeId: string | null;
     onActivate: (id: string) => void;
@@ -1046,6 +1106,8 @@ function TimelineRowGroup({
                 overflow: "hidden",
             }}
         >
+            {mode === "proportional" && <GridHighlightsOverlay highlights={highlights} />}
+
             {mode === "proportional" && (
                 <div
                     aria-hidden="true"
@@ -1207,6 +1269,7 @@ function TimelineSection({
     mode,
     segments,
     influences,
+    highlights,
     compressedWidths,
     activeId,
     onActivate,
@@ -1216,6 +1279,7 @@ function TimelineSection({
     mode: DisplayMode;
     segments: Segment[];
     influences: InfluenceInterval[];
+    highlights: GridHighlight[];
     compressedWidths: Record<string, number>;
     activeId: string | null;
     onActivate: (id: string) => void;
@@ -1236,6 +1300,7 @@ function TimelineSection({
                 mode={mode}
                 segments={segments}
                 influences={influences}
+                highlights={highlights}
                 compressedWidths={compressedWidths}
                 activeId={activeId}
                 onActivate={onActivate}
@@ -1250,6 +1315,10 @@ export default function SingleDayLog() {
 
     const segments = useMemo(
         () => buildSegments(fixtureEvents, fixtureInfluences),
+        []
+    );
+    const highlights = useMemo(
+        () => buildGridHighlights(fixtureGridHighlightInputs),
         []
     );
     const [activeId, setActiveId] = useState<string | null>(segments[0]?.id ?? null);
@@ -1364,6 +1433,7 @@ export default function SingleDayLog() {
                         mode={mode}
                         segments={segments}
                         influences={fixtureInfluences}
+                        highlights={highlights}
                         compressedWidths={compressedWidths}
                         activeId={activeId}
                         onActivate={setActiveId}
@@ -1375,6 +1445,7 @@ export default function SingleDayLog() {
                         mode={mode}
                         segments={segments}
                         influences={fixtureInfluences}
+                        highlights={highlights}
                         compressedWidths={compressedWidths}
                         activeId={activeId}
                         onActivate={setActiveId}

@@ -15,9 +15,9 @@
 
 ### Background
 - [x] One hour hash marks
-- [-] Maybe: half-hour hash marks
 - [ ] Highlight section of grid with gently transparent color
 - [ ] Experiment 3-4 stacked highlights or toggling
+- [ ] ~~Maybe: half-hour hash marks~~
 
 
 
@@ -110,6 +110,7 @@
 4:56p
 - Drawing one hour guidelines on grid
 - Changed times to be one hour with brief pm indicators
+
 11:00a-ish
 - Completed first pass (multiday project) of ViolationCap component: shows where violations start on timeline
 
@@ -117,9 +118,11 @@
 6:24p
 - PC/YM notations under off-duty and on-duty
 - Driving row 'shadows' showing driving time that was suppressed
+
 10:33a
 - Established TODO workflow
 - Identified need for timezone abstraction
+
 11:14a
 - [x] Move 'Next Prompt' from design notebook to formal `todo.md`
 - [x] Code refactor: target large blocks
