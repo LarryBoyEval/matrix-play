@@ -3,21 +3,8 @@
 ## 🔥 Next Up (start here every session)
 
 ### Driving / Duty Limits
-- [x] Prototype driving, shift, on-duty, and multi-day limits
-  - [x] Include stacking (earliest-on-top)
-  - [x] Consider overlay vs grouped visual model: note: border colors with horizontal offsets allow expert violation
-        category detection
-  - [x] Rough out some icons, test vs. text. (Text wins)
-  - [x] Consider half-pill vs. octagon/stop sign shaps. (Octagons win)
-  - [x] Signal when in-violation (fill red; keep border colored by by violation category)
-  - [x] Fade violation categories .. futher distance = less opacity
   - [ ] Implement time-based positioning
 
-### Background
-- [x] One hour hash marks
-- [ ] Highlight section of grid with gently transparent color
-- [ ] Experiment 3-4 stacked highlights or toggling
-- [ ] ~~Maybe: half-hour hash marks~~
 
 
 
@@ -90,6 +77,22 @@
 
 ## ✅ Recently Completed (most recent first)
 
+### Background
+- [x] One hour hash marks
+- [x] Highlight section of grid with gently transparent color
+- [x] Experiment 3-4 stacked highlights or toggling (stacking works well; better with same color)
+- [ ] ~~Maybe: half-hour hash marks~~
+
+### Driving / Duty Limits
+- [x] Prototype driving, shift, on-duty, and multi-day limits
+  - [x] Include stacking (earliest-on-top)
+  - [x] Consider overlay vs grouped visual model: note: border colors with horizontal offsets allow expert violation
+        category detection
+  - [x] Rough out some icons, test vs. text. (Text wins)
+  - [x] Consider half-pill vs. octagon/stop sign shaps. (Octagons win)
+  - [x] Signal when in-violation (fill red; keep border colored by by violation category)
+  - [x] Fade violation categories .. futher distance = less opacity
+
 ### Notation Prototypes
 - [x] Prototype Personal Conveyance notation
 - [x] Prototype Yard Move notation
@@ -107,6 +110,9 @@
 ## 🧪 Session Notes
 
 ### 2026-04-16
+6:17p
+- Grid highlighter: full height, multiple start/stop layers of different colors/transparencies
+
 4:56p
 - Drawing one hour guidelines on grid
 - Changed times to be one hour with brief pm indicators
