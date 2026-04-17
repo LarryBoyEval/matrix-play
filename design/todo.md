@@ -2,9 +2,12 @@
 
 ## 🔥 Next Up (start here every session)
 
+- [ ] Fix timebar hints: Length - Start/Stop - Status
+- [ ] Show Violation markers/caps in Condensed Mode
 
 ### Driving / Duty Limits
-  - [ ] Implement time-based positioning
+  - [ ] ViolationCaps: Implement time-based positioning/fixtures
+
 
 
 ## ⚡ Active Work
@@ -110,6 +113,13 @@
 ## 🧪 Session Notes
 6:33p
 - Added toggle buttle for highlights on/off
+### 2026-04-17
+5:31p
+- [ ] ~~Allow seconds on Fixture timestamps~~ Was already in code
+- [x] ~~Round~~ Trunc to nearest minutes on timebars .. rounding pushed 1:59:30 rest to 2hr .. bad .. switch to Trunc
+- [x] Show seconds on segment detail hints
+- [x] Show "+" if even-hour (no minutes) plus > 0 seconds .. so 11hr20sec shows indicates 11h+ hours driving
+      for example rather than 11h which looks legal
 
 ### 2026-04-16
 6:17p

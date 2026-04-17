@@ -70,10 +70,10 @@ const ROW_LABEL_COLUMN_WIDTH = 120;
 
 const fixtureEvents: DutyEvent[] = [
     { id: "a", kind: "offDuty", time: "00:00:00" },
-    { id: "b", kind: "sleeper", time: "00:30:00" },
+    { id: "b", kind: "sleeper", time: "00:30:01" },
     { id: "c", kind: "offDuty", time: "01:00:00" },
     { id: "d", kind: "onDuty", time: "02:45:00" },
-    { id: "e", kind: "driving", time: "09:45:00" },
+    { id: "e", kind: "driving", time: "09:45:22" },
     { id: "f", kind: "onDuty", time: "19:45:00" },
     { id: "g", kind: "sleeper", time: "23:45:00" },
     { id: "h", kind: "offDuty", time: "1d00:00:00" },
@@ -431,14 +431,17 @@ function getSegmentInfluenceSlices(
 }
 
 function formatDurationLabelCompact(totalSeconds: number): string {
-    const totalMinutes = Math.round(totalSeconds / 60);
+    const totalMinutes = Math.floor(totalSeconds / 60);
 
     if (totalMinutes < 30) return "";
 
     const hours = Math.floor(totalMinutes / 60);
     const minutes = totalMinutes % 60;
 
-    if (minutes === 0 && hours > 0) return `${hours}h`;
+    if (minutes === 0 && hours > 0) {
+        const hasExtraSeconds = totalSeconds % 60 > 0;
+        return `${hours}h${hasExtraSeconds ? "+" : ""}`;
+    }
 
     if (hours > 0) {
         return `${hours}:${String(minutes).padStart(2, "0")}`;
@@ -448,14 +451,25 @@ function formatDurationLabelCompact(totalSeconds: number): string {
 }
 
 function formatDurationLabelFull(totalSeconds: number): string {
-    const totalMinutes = Math.round(totalSeconds / 60);
+    const roundedSeconds = Math.max(0, Math.round(totalSeconds));
 
-    const hours = Math.floor(totalMinutes / 60);
-    const minutes = totalMinutes % 60;
+    const hours = Math.floor(roundedSeconds / 3600);
+    const minutes = Math.floor((roundedSeconds % 3600) / 60);
+    const seconds = roundedSeconds % 60;
 
-    if (hours > 0 && minutes > 0) return `${hours}h${minutes}m`;
-    if (hours > 0) return `${hours}h`;
-    return `${minutes}m`;
+    if (hours > 0) {
+        if (minutes === 0 && seconds === 0) return `${hours}h`;
+        if (minutes === 0) return `${hours}h ${seconds}s`;
+        if (seconds === 0) return `${hours}h ${minutes}m`;
+        return `${hours}h ${minutes}m ${seconds}s`;
+    }
+
+    if (minutes > 0) {
+        if (seconds === 0) return `${minutes}m`;
+        return `${minutes}m ${seconds}s`;
+    }
+
+    return `${seconds}s`;
 }
 
 function formatClock(totalSeconds: number): string {
