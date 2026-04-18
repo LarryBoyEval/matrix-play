@@ -2,7 +2,6 @@
 
 ## 🔥 Next Up (start here every session)
 
-- [ ] Fix timebar hints: Length - Start/Stop - Status
 - [ ] Show Violation markers/caps in Condensed Mode
 
 ### Driving / Duty Limits
@@ -114,6 +113,8 @@
 6:33p
 - Added toggle buttle for highlights on/off
 ### 2026-04-17
+5:58p
+- [x] Fix timebar hints. Show: Segment Length - Start/Stop - Duty Status. Show dates if crossing days.
 5:31p
 - [ ] ~~Allow seconds on Fixture timestamps~~ Was already in code
 - [x] ~~Round~~ Trunc to nearest minutes on timebars .. rounding pushed 1:59:30 rest to 2hr .. bad .. switch to Trunc

@@ -472,6 +472,58 @@ function formatDurationLabelFull(totalSeconds: number): string {
     return `${seconds}s`;
 }
 
+function formatClockShort(totalSeconds: number): string {
+    const secondsIntoDay = totalSeconds % 86400;
+
+    const hours24 = Math.floor(secondsIntoDay / 3600);
+    const minutes = Math.floor((secondsIntoDay % 3600) / 60);
+    const seconds = secondsIntoDay % 60;
+
+    const suffix = hours24 >= 12 ? "p" : "a";
+    const hour12 = hours24 % 12 === 0 ? 12 : hours24 % 12;
+
+    return `${hour12}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}${suffix}`;
+}
+
+function formatMonthDayFromOffset(dayOffset: number): string {
+    const base = new Date();
+    base.setHours(0, 0, 0, 0);
+
+    const d = new Date(base);
+    d.setDate(base.getDate() + dayOffset);
+
+    const month = d.getMonth() + 1;
+    const day = d.getDate();
+
+    return `${month}/${day}`;
+}
+
+function formatSegmentTimeRange(startSecond: number, endSecond: number): string {
+    const startDay = Math.floor(startSecond / 86400);
+    const endDay = Math.floor(endSecond / 86400);
+
+    if (startDay === endDay) {
+        return `${formatClockShort(startSecond)}-${formatClockShort(endSecond)}`;
+    }
+
+    const startSecondsIntoDay = startSecond % 86400;
+    const endSecondsIntoDay = endSecond % 86400;
+
+    return `${formatMonthDayFromOffset(startDay)} ${formatClockShort(
+        startSecondsIntoDay
+    )} - ${formatMonthDayFromOffset(endDay)} ${formatClockShort(endSecondsIntoDay)}`;
+}
+
+function getSegmentHint(segment: Segment): string {
+    const meta = kindMeta[segment.kind];
+
+    return [
+        `${formatDurationLabelFull(getDurationSeconds(segment))}`,
+        `${formatSegmentTimeRange(segment.startSecond, segment.endSecond)}`,
+        `${meta.label}`,
+    ].join("\n");
+}
+
 function formatClock(totalSeconds: number): string {
     const day = Math.floor(totalSeconds / 86400);
     const secondsIntoDay = totalSeconds % 86400;
@@ -855,7 +907,7 @@ function WorkSegment({
             onMouseEnter={onActivate}
             onFocus={onActivate}
             onClick={onActivate}
-            title={`${meta.label} ${formatDurationLabelFull(getDurationSeconds(segment))}`}
+            title={getSegmentHint(segment)}
             style={{
                 width: widthMode === "proportional" ? `${width}%` : width,
                 flex: "0 0 auto",
@@ -936,7 +988,7 @@ function RestSegment({
             onMouseEnter={onActivate}
             onFocus={onActivate}
             onClick={onActivate}
-            title={`${meta.label} ${formatDurationLabelFull(getDurationSeconds(segment))}`}
+            title={getSegmentHint(segment)}
             style={{
                 width: widthMode === "proportional" ? `${width}%` : width,
                 flex: "0 0 auto",
