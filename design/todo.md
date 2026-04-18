@@ -110,11 +110,12 @@
 ---
 
 ## 🧪 Session Notes
-6:33p
-- Added toggle buttle for highlights on/off
+
 ### 2026-04-17
+6:06p
+- [x] Use today as current date for demo purposes
 5:58p
-- [x] Fix timebar hints. Show: Segment Length - Start/Stop - Duty Status. Show dates if crossing days.
+- [x] Fix timebar hints. Show: Segment Length - Start/Stop - Duty Status. Show dates if crossing
 5:31p
 - [ ] ~~Allow seconds on Fixture timestamps~~ Was already in code
 - [x] ~~Round~~ Trunc to nearest minutes on timebars .. rounding pushed 1:59:30 rest to 2hr .. bad .. switch to Trunc
@@ -123,6 +124,8 @@
       for example rather than 11h which looks legal
 
 ### 2026-04-16
+6:33p
+- Added toggle buttle for highlights on/off
 6:17p
 - Grid highlighter: full height, multiple start/stop layers of different colors/transparencies
 
