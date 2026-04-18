@@ -65,6 +65,14 @@ type GridHighlight = {
     opacity: number;
 };
 
+// type TimelineScale = {
+//   startSecond: number;
+//   endSecond: number;
+//   durationSeconds: number;
+//   pixelsPerHour: number;
+//   canvasWidthPx: number;
+// };
+
 const TRACK_X_PADDING = 8;
 const ROW_LABEL_COLUMN_WIDTH = 120;
 
@@ -183,6 +191,16 @@ const kindMeta: Record<
         chipText: "#334155",
     },
 };
+
+// function buildTimelineScale(
+//   startSecond: number,
+//   endSecond: number,
+//   pixelsPerHour: number
+// ): TimelineScale
+
+// function timeToPx(second: number, scale: TimelineScale): number
+
+// function durationToPx(seconds: number, scale: TimelineScale): number
 
 function getTierPadding(minutes: number): number {
     if (minutes < 30) return 0;
@@ -771,6 +789,47 @@ function SegmentDetails({ segment }: { segment: Segment | null }) {
     );
 }
 
+function TimelineViewport({
+    children,
+}: {
+    children: React.ReactNode;
+}) {
+    return (
+        <div
+            style={{
+                overflowX: "auto",
+                overflowY: "hidden",
+                WebkitOverflowScrolling: "touch",
+                minWidth: 0,
+                maxWidth: "100%",
+            }}
+        >
+            {children}
+        </div>
+    );
+}
+
+function TimelineCanvas({
+    widthPx,
+    children,
+}: {
+    widthPx: number;
+    children: React.ReactNode;
+}) {
+    return (
+        <div
+            style={{
+                width: widthPx,
+                minWidth: "100%",
+                display: "grid",
+                gap: 12,
+            }}
+        >
+            {children}
+        </div>
+    );
+}
+
 function ToolbarButton({
     active,
     children,
@@ -1329,52 +1388,6 @@ function TimelineRowGroup({
     );
 }
 
-function TimelineSection({
-    parent,
-    rowMode,
-    mode,
-    segments,
-    influences,
-    highlights,
-    compressedWidths,
-    activeId,
-    onActivate,
-}: {
-    parent: ParentRow;
-    rowMode: RowMode;
-    mode: DisplayMode;
-    segments: Segment[];
-    influences: InfluenceInterval[];
-    highlights: GridHighlight[];
-    compressedWidths: Record<string, number>;
-    activeId: string | null;
-    onActivate: (id: string) => void;
-}) {
-    return (
-        <div
-            style={{
-                display: "grid",
-                gridTemplateColumns: `${ROW_LABEL_COLUMN_WIDTH}px 1fr`,
-                alignItems: "stretch",
-                gap: 8,
-            }}
-        >
-            <RowLabels parent={parent} rowMode={rowMode} />
-            <TimelineRowGroup
-                parent={parent}
-                rowMode={rowMode}
-                mode={mode}
-                segments={segments}
-                influences={influences}
-                highlights={highlights}
-                compressedWidths={compressedWidths}
-                activeId={activeId}
-                onActivate={onActivate}
-            />
-        </div>
-    );
-}
-
 export default function SingleDayLog() {
     const [mode, setMode] = useState<DisplayMode>("compressed");
     const [rowMode, setRowMode] = useState<RowMode>("2-row");
@@ -1392,6 +1405,7 @@ export default function SingleDayLog() {
 
     const compressedWidths = useMemo(() => getCompressedWidths(segments), [segments]);
     const activeSegment = segments.find((segment) => segment.id === activeId) ?? null;
+    const timelineCanvasWidth = mode === "proportional" ? 1600 : 1400;
 
     return (
         <div
@@ -1502,35 +1516,56 @@ export default function SingleDayLog() {
                         </div>
                     </div>
 
-                    <TimelineSection
-                        parent="rest"
-                        rowMode={rowMode}
-                        mode={mode}
-                        segments={segments}
-                        influences={fixtureInfluences}
-                        highlights={showHighlights ? highlights : []}
-                        compressedWidths={compressedWidths}
-                        activeId={activeId}
-                        onActivate={setActiveId}
-                    />
+                    <div
+                        style={{
+                            display: "grid",
+                            gridTemplateColumns: `${ROW_LABEL_COLUMN_WIDTH}px 1fr`,
+                            alignItems: "start",
+                            gap: 8,
+                        }}
+                    >
+                        <div
+                            style={{
+                                display: "grid",
+                                gap: 12,
+                            }}
+                        >
+                            <RowLabels parent="rest" rowMode={rowMode} />
+                            <RowLabels parent="work" rowMode={rowMode} />
 
-                    <TimelineSection
-                        parent="work"
-                        rowMode={rowMode}
-                        mode={mode}
-                        segments={segments}
-                        influences={fixtureInfluences}
-                        highlights={showHighlights ? highlights : []}
-                        compressedWidths={compressedWidths}
-                        activeId={activeId}
-                        onActivate={setActiveId}
-                    />
-
-                    {mode === "proportional" && (
-                        <div style={{ marginLeft: ROW_LABEL_COLUMN_WIDTH + 8 }}>
-                            <Axis />
+                            {mode === "proportional" ? <div style={{ height: 42 }} /> : null}
                         </div>
-                    )}
+
+                        <TimelineViewport>
+                            <TimelineCanvas widthPx={timelineCanvasWidth}>
+                                <TimelineRowGroup
+                                    parent="rest"
+                                    rowMode={rowMode}
+                                    mode={mode}
+                                    segments={segments}
+                                    influences={fixtureInfluences}
+                                    highlights={showHighlights ? highlights : []}
+                                    compressedWidths={compressedWidths}
+                                    activeId={activeId}
+                                    onActivate={setActiveId}
+                                />
+
+                                <TimelineRowGroup
+                                    parent="work"
+                                    rowMode={rowMode}
+                                    mode={mode}
+                                    segments={segments}
+                                    influences={fixtureInfluences}
+                                    highlights={showHighlights ? highlights : []}
+                                    compressedWidths={compressedWidths}
+                                    activeId={activeId}
+                                    onActivate={setActiveId}
+                                />
+
+                                {mode === "proportional" && <Axis />}
+                            </TimelineCanvas>
+                        </TimelineViewport>
+                    </div>
                 </div>
 
                 <div
