@@ -65,13 +65,39 @@ type GridHighlight = {
     opacity: number;
 };
 
-// type TimelineScale = {
-//   startSecond: number;
-//   endSecond: number;
-//   durationSeconds: number;
-//   pixelsPerHour: number;
-//   canvasWidthPx: number;
-// };
+type TimelineScale = {
+    startSecond: number;
+    endSecond: number;
+    durationSeconds: number;
+    pixelsPerHour: number;
+    canvasWidthPx: number;
+};
+
+function buildTimelineScale(
+    startSecond: number,
+    endSecond: number,
+    pixelsPerHour: number
+): TimelineScale {
+    const durationSeconds = Math.max(1, endSecond - startSecond);
+    const canvasWidthPx = (durationSeconds / 3600) * pixelsPerHour;
+
+    return {
+        startSecond,
+        endSecond,
+        durationSeconds,
+        pixelsPerHour,
+        canvasWidthPx,
+    };
+}
+
+function clampToScale(second: number, scale: TimelineScale): number {
+    return Math.max(scale.startSecond, Math.min(scale.endSecond, second));
+}
+
+function timeToPx(second: number, scale: TimelineScale): number {
+    const clamped = clampToScale(second, scale);
+    return ((clamped - scale.startSecond) / scale.durationSeconds) * scale.canvasWidthPx;
+}
 
 const TRACK_X_PADDING = 8;
 const ROW_LABEL_COLUMN_WIDTH = 120;
@@ -192,15 +218,14 @@ const kindMeta: Record<
     },
 };
 
-// function buildTimelineScale(
-//   startSecond: number,
-//   endSecond: number,
-//   pixelsPerHour: number
-// ): TimelineScale
+const pixelsPerHour = 60;
+const timelineScale = useMemo(
+    () => buildTimelineScale(0, 86400, pixelsPerHour),
+    []
+);
 
-// function timeToPx(second: number, scale: TimelineScale): number
-
-// function durationToPx(seconds: number, scale: TimelineScale): number
+// const timelineCanvasWidth =
+//     mode === "proportional" ? timelineScale.canvasWidthPx : 1400;
 
 function getTierPadding(minutes: number): number {
     if (minutes < 30) return 0;
@@ -269,14 +294,16 @@ function buildGridHighlights(inputs: GridHighlightInput[]): GridHighlight[] {
     }));
 }
 
-function clampDayPercent(second: number): number {
-    return Math.max(0, Math.min(100, (second / 86400) * 100));
-}
+// function clampDayPercent(second: number): number {
+//     return Math.max(0, Math.min(100, (second / 86400) * 100));
+// }
 
 function GridHighlightsOverlay({
     highlights,
+    scale,
 }: {
     highlights: GridHighlight[];
+    scale: TimelineScale;
 }) {
     return (
         <div
@@ -289,17 +316,17 @@ function GridHighlightsOverlay({
             }}
         >
             {highlights.map((highlight, index) => {
-                const left = clampDayPercent(highlight.startSecond);
-                const right = clampDayPercent(highlight.endSecond);
-                const width = Math.max(0, right - left);
+                const leftPx = timeToPx(highlight.startSecond, scale);
+                const rightPx = timeToPx(highlight.endSecond, scale);
+                const widthPx = Math.max(0, rightPx - leftPx);
 
                 return (
                     <div
                         key={`${highlight.startSecond}-${highlight.endSecond}-${highlight.color}-${index}`}
                         style={{
                             position: "absolute",
-                            left: `${left}%`,
-                            width: `${width}%`,
+                            left: leftPx,
+                            width: widthPx,
                             top: 0,
                             bottom: 0,
                             background: highlight.color,
@@ -616,21 +643,22 @@ function renderSpacer(
     );
 }
 
-function Axis() {
+function Axis({
+    widthPx,
+}: {
+    widthPx: number;
+}) {
     const ticks = Array.from({ length: 25 }, (_, i) => i);
 
     function formatHourLabel(hour: number): string {
         if (hour === 0 || hour === 24) return "12a";
         if (hour === 12) return "N";
 
-        // PM hours with suffix (1p–9p)
         if (hour >= 13 && hour <= 21) return `${hour - 12}p`;
 
-        // Late evening without suffix
         if (hour === 22) return "10";
         if (hour === 23) return "11";
 
-        // Morning hours (no 'a')
         if (hour >= 1 && hour <= 11) return `${hour}`;
 
         return "";
@@ -641,9 +669,10 @@ function Axis() {
             style={{
                 marginTop: 12,
                 height: 42,
-                width: "100%",
+                width: widthPx,
                 padding: `0 ${TRACK_X_PADDING}px`,
                 boxSizing: "border-box",
+                flex: "0 0 auto",
             }}
         >
             <div
@@ -902,8 +931,10 @@ function ProportionalInfluenceOverlay({
 
 function DrivingRowCounterfactualOverlay({
     influences,
+    scale,
 }: {
     influences: InfluenceInterval[];
+    scale: TimelineScale;
 }) {
     return (
         <div
@@ -914,17 +945,17 @@ function DrivingRowCounterfactualOverlay({
             }}
         >
             {influences.map((influence, index) => {
-                const leftPct = (influence.startSecond / 86400) * 100;
-                const widthPct =
-                    ((influence.endSecond - influence.startSecond) / 86400) * 100;
+                const leftPx = timeToPx(influence.startSecond, scale);
+                const rightPx = timeToPx(influence.endSecond, scale);
+                const widthPx = Math.max(0, rightPx - leftPx);
 
                 return (
                     <div
                         key={`${influence.kind}-${influence.startSecond}-${influence.endSecond}-${index}`}
                         style={{
                             position: "absolute",
-                            left: `${leftPct}%`,
-                            width: `${widthPct}%`,
+                            left: leftPx,
+                            width: widthPx,
                             top: "50%",
                             transform: "translateY(-50%)",
                             height: 1,
@@ -1199,6 +1230,7 @@ function TimelineRowGroup({
     compressedWidths,
     activeId,
     onActivate,
+    scale,
 }: {
     parent: ParentRow;
     rowMode: RowMode;
@@ -1209,6 +1241,7 @@ function TimelineRowGroup({
     compressedWidths: Record<string, number>;
     activeId: string | null;
     onActivate: (id: string) => void;
+    scale?: TimelineScale;
 }) {
     const isRestParent = parent === "rest";
     const subRows =
@@ -1231,7 +1264,9 @@ function TimelineRowGroup({
                 overflow: "hidden",
             }}
         >
-            {mode === "proportional" && <GridHighlightsOverlay highlights={highlights} />}
+            {mode === "proportional" && scale && (
+                <GridHighlightsOverlay highlights={highlights} scale={scale} />
+            )}
 
             {mode === "proportional" && (
                 <div
@@ -1278,10 +1313,14 @@ function TimelineRowGroup({
                 >
                     {mode === "proportional" &&
                         rowMode === "4-row" &&
-                        subRow.key === "driving" && (
-                            <DrivingRowCounterfactualOverlay influences={influences} />
+                        subRow.key === "driving" &&
+                        scale && (
+                            <DrivingRowCounterfactualOverlay
+                                influences={influences}
+                                scale={scale}
+                            />
                         )}
-
+                        
                     {segments.map((segment) => {
                         const { proportionalWidth, compressedWidth } = getSegmentWidths(
                             segment,
@@ -1405,7 +1444,13 @@ export default function SingleDayLog() {
 
     const compressedWidths = useMemo(() => getCompressedWidths(segments), [segments]);
     const activeSegment = segments.find((segment) => segment.id === activeId) ?? null;
-    const timelineCanvasWidth = mode === "proportional" ? 1600 : 1400;
+    const pixelsPerHour = 60;
+    const visibleHours = 24;
+    const proportionalCanvasWidth = pixelsPerHour * visibleHours;
+    const compressedCanvasWidth = 60 * 24; // temp
+
+    const timelineCanvasWidth =
+        mode === "proportional" ? proportionalCanvasWidth : compressedCanvasWidth;
 
     return (
         <div
@@ -1544,6 +1589,7 @@ export default function SingleDayLog() {
                                     mode={mode}
                                     segments={segments}
                                     influences={fixtureInfluences}
+                                    scale={timelineScale}
                                     highlights={showHighlights ? highlights : []}
                                     compressedWidths={compressedWidths}
                                     activeId={activeId}
@@ -1556,13 +1602,14 @@ export default function SingleDayLog() {
                                     mode={mode}
                                     segments={segments}
                                     influences={fixtureInfluences}
+                                    scale={timelineScale}
                                     highlights={showHighlights ? highlights : []}
                                     compressedWidths={compressedWidths}
                                     activeId={activeId}
                                     onActivate={setActiveId}
                                 />
 
-                                {mode === "proportional" && <Axis />}
+                                {mode === "proportional" && <Axis widthPx={timelineScale.canvasWidthPx} />}
                             </TimelineCanvas>
                         </TimelineViewport>
                     </div>
