@@ -218,15 +218,6 @@ const kindMeta: Record<
     },
 };
 
-const pixelsPerHour = 60;
-const timelineScale = useMemo(
-    () => buildTimelineScale(0, 86400, pixelsPerHour),
-    []
-);
-
-// const timelineCanvasWidth =
-//     mode === "proportional" ? timelineScale.canvasWidthPx : 1400;
-
 function getTierPadding(minutes: number): number {
     if (minutes < 30) return 0;
     if (minutes < 120) return 0;
@@ -644,24 +635,40 @@ function renderSpacer(
 }
 
 function Axis({
-    widthPx,
+    scale,
 }: {
-    widthPx: number;
+    scale: TimelineScale;
 }) {
-    const ticks = Array.from({ length: 25 }, (_, i) => i);
+    function formatHourLabel(totalSecond: number): string {
+        const secondsIntoDay = ((totalSecond % 86400) + 86400) % 86400;
+        const hour = Math.floor(secondsIntoDay / 3600);
 
-    function formatHourLabel(hour: number): string {
-        if (hour === 0 || hour === 24) return "12a";
+        if (hour === 0) return "12a";
         if (hour === 12) return "N";
 
         if (hour >= 13 && hour <= 21) return `${hour - 12}p`;
-
         if (hour === 22) return "10";
         if (hour === 23) return "11";
-
         if (hour >= 1 && hour <= 11) return `${hour}`;
 
         return "";
+    }
+
+    const firstHour = Math.ceil(scale.startSecond / 3600);
+    const lastHour = Math.floor(scale.endSecond / 3600);
+
+    const ticks: number[] = [];
+    for (let hour = firstHour; hour <= lastHour; hour++) {
+        const second = hour * 3600;
+        if (second < scale.startSecond || second > scale.endSecond) continue;
+        ticks.push(second);
+    }
+
+    const innerWidthPx = scale.canvasWidthPx - TRACK_X_PADDING * 2;
+
+    function timeToAxisPx(second: number): number {
+        const clamped = Math.max(scale.startSecond, Math.min(scale.endSecond, second));
+        return ((clamped - scale.startSecond) / scale.durationSeconds) * innerWidthPx;
     }
 
     return (
@@ -669,52 +676,62 @@ function Axis({
             style={{
                 marginTop: 12,
                 height: 42,
-                width: widthPx,
-                padding: `0 ${TRACK_X_PADDING}px`,
+                width: scale.canvasWidthPx,
                 boxSizing: "border-box",
                 flex: "0 0 auto",
+                position: "relative",
             }}
         >
             <div
                 style={{
-                    position: "relative",
-                    height: "100%",
-                    width: "100%",
+                    position: "absolute",
+                    top: 0,
+                    bottom: 0,
+                    left: TRACK_X_PADDING,
+                    right: TRACK_X_PADDING,
                 }}
             >
-                {ticks.map((hour) => (
-                    <div
-                        key={hour}
-                        style={{
-                            position: "absolute",
-                            left: `${(hour / 24) * 100}%`,
-                            top: 0,
-                            transform: "translateX(-50%)",
-                            textAlign: "center",
-                        }}
-                    >
+                {ticks.map((second) => {
+                    const rawLeftPx = timeToAxisPx(second);
+                    const leftPx =
+                        second === scale.endSecond
+                            ? Math.max(0, innerWidthPx - 1)
+                            : Math.max(0, rawLeftPx);
+
+                    return (
                         <div
+                            key={second}
                             style={{
-                                width: 0,
-                                height: 10,
-                                margin: "0 auto",
-                                borderLeft: "1px solid #94a3b8",
-                            }}
-                        />
-                        <div
-                            style={{
-                                marginTop: 4,
-                                fontSize: 10,
-                                color: "#64748b",
-                                whiteSpace: "nowrap",
+                                position: "absolute",
+                                left: leftPx,
+                                top: 0,
+                                transform: "translateX(-50%)",
                                 textAlign: "center",
-                                minWidth: 16,
                             }}
                         >
-                            {formatHourLabel(hour)}
+                            <div
+                                style={{
+                                    width: 0,
+                                    height: 10,
+                                    margin: "0 auto",
+                                    borderLeft: "1px solid #94a3b8",
+                                }}
+                            />
+                            <div
+                                style={{
+                                    marginTop: 4,
+                                    fontSize: 10,
+                                    color: "#64748b",
+                                    whiteSpace: "nowrap",
+                                    textAlign: "center",
+                                    minWidth: 16,
+                                }}
+                            >
+                                {formatHourLabel(second)}
+                            </div>
                         </div>
-                    </div>
-                ))}
+                    );
+                })}
             </div>
         </div>
     );
@@ -965,6 +982,61 @@ function DrivingRowCounterfactualOverlay({
                             ),
                             borderRadius: 9999,
                             opacity: 0.40,
+                        }}
+                    />
+                );
+            })}
+        </div>
+    );
+}
+
+function HourGuidelinesOverlay({
+    scale,
+}: {
+    scale: TimelineScale;
+}) {
+    const firstHour = Math.ceil(scale.startSecond / 3600);
+    const lastHour = Math.floor(scale.endSecond / 3600);
+
+    const hourMarks: number[] = [];
+
+    for (let hour = firstHour; hour <= lastHour; hour++) {
+        const second = hour * 3600;
+        if (second < scale.startSecond || second > scale.endSecond) continue;
+        hourMarks.push(second);
+    }
+
+    return (
+        <div
+            aria-hidden="true"
+            style={{
+                position: "absolute",
+                inset: 0,
+                pointerEvents: "none",
+                zIndex: 0,
+            }}
+        >
+            {hourMarks.map((second) => {
+                const rawLeftPx = timeToPx(second, scale);
+                const leftPx =
+                    second === scale.endSecond
+                        ? Math.max(0, scale.canvasWidthPx - 1)
+                        : Math.max(0, rawLeftPx);
+
+                const dayBoundary = second % 86400 === 0;
+
+                return (
+                    <div
+                        key={second}
+                        style={{
+                            position: "absolute",
+                            left: leftPx,
+                            top: 0,
+                            bottom: 0,
+                            width: 0,
+                            borderLeft: dayBoundary
+                                ? "1px solid rgba(15, 23, 42, 0.14)"
+                                : "1px solid rgba(15, 23, 42, 0.06)",
                         }}
                     />
                 );
@@ -1268,33 +1340,18 @@ function TimelineRowGroup({
                 <GridHighlightsOverlay highlights={highlights} scale={scale} />
             )}
 
-            {mode === "proportional" && (
+            {mode === "proportional" && scale && (
                 <div
                     aria-hidden="true"
                     style={{
                         position: "absolute",
                         inset: `12px ${TRACK_X_PADDING}px`,
-                        backgroundImage: `
-                            linear-gradient(
-                                to right,
-                                rgba(15, 23, 42, 0.06) 0px,
-                                rgba(15, 23, 42, 0.06) 1px,
-                                transparent 1px
-                            ),
-                            repeating-linear-gradient(
-                                to right,
-                                transparent 0,
-                                transparent calc((100% / 24) - 1px),
-                                rgba(15, 23, 42, 0.06) calc((100% / 24) - 1px),
-                                rgba(15, 23, 42, 0.06) calc(100% / 24)
-                            )
-                        `,
-                        backgroundRepeat: "repeat",
-                        backgroundSize: "100% 100%",
                         pointerEvents: "none",
                         zIndex: 0,
                     }}
-                />
+                >
+                    <HourGuidelinesOverlay scale={scale} />
+                </div>
             )}
 
             {subRows.map((subRow) => (
@@ -1320,7 +1377,7 @@ function TimelineRowGroup({
                                 scale={scale}
                             />
                         )}
-                        
+
                     {segments.map((segment) => {
                         const { proportionalWidth, compressedWidth } = getSegmentWidths(
                             segment,
@@ -1448,6 +1505,12 @@ export default function SingleDayLog() {
     const visibleHours = 24;
     const proportionalCanvasWidth = pixelsPerHour * visibleHours;
     const compressedCanvasWidth = 60 * 24; // temp
+
+    const timelineScale = useMemo(
+        () => buildTimelineScale(0, 86400, pixelsPerHour),
+        []
+    );
+
 
     const timelineCanvasWidth =
         mode === "proportional" ? proportionalCanvasWidth : compressedCanvasWidth;
@@ -1609,7 +1672,7 @@ export default function SingleDayLog() {
                                     onActivate={setActiveId}
                                 />
 
-                                {mode === "proportional" && <Axis widthPx={timelineScale.canvasWidthPx} />}
+                                {mode === "proportional" && <Axis scale={timelineScale} />}
                             </TimelineCanvas>
                         </TimelineViewport>
                     </div>

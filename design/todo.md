@@ -14,6 +14,9 @@
 - [x] Prevent page-level horizontal scroll (contain scroll to timeline only)
 
 #### Pass 2 — Timeline Scale Abstraction
+- [x] Convert Duty blocks, CounterFactual and Highlights to use calculated day widths instad of hard-coded
+- [x] Convert 'Axis' timeline to use times rather than 24 even hours
+- [x] Fixed padding-type issue with canvas vs 'track'
 - [ ] Introduce `TimelineScale` model:
   - [ ] `startSecond`
   - [ ] `endSecond`
@@ -159,6 +162,10 @@
 ## 🧪 Session Notes
 
 ### 2026-04-18
+2:43p
+- [x] Tick marks for hours and days now drawing based on time instead of screen width. Small adjustment for 'track' vs 'canvas'.
+1:25p
+- [x] Converted several UI timelines to use calculated day widths (24 hr) over hard coded values in prep for multi-day
 12:36p
 - [x] Introduced side-scrolling to (oversized) one day grid
 - [x] Moved lables out of scrolling region
