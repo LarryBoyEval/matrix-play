@@ -162,6 +162,8 @@
 ## 🧪 Session Notes
 
 ### 2026-04-19
+12:29p
+- [x] Moved ViolationCaps to a fixture
 12:16p
 - [x] Center time labels on their rows in 2 and 4-line mode
   - [x] Restructured main layout to a grid to simplify time label alignment vs. pure divs

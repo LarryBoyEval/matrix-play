@@ -155,6 +155,58 @@ const fixtureGridHighlightInputs: GridHighlightInput[] = [
     },
 ];
 
+type ViolationCapFixture = {
+    type: "break" | "driving" | "shift" | "onduty" | "cycle";
+    shape: "octagon";
+    displayMode: "number";
+    urgency: "triggered" | "imminent" | "near" | "watch" | "distant";
+    time: string;
+    top: number;
+};
+
+const fixtureViolationCaps: ViolationCapFixture[] = [
+    {
+        type: "break",
+        shape: "octagon",
+        displayMode: "number",
+        urgency: "triggered",
+        time: "18:30:00",
+        top: 2,
+    },
+    {
+        type: "driving",
+        shape: "octagon",
+        displayMode: "number",
+        urgency: "imminent",
+        time: "21:00:00",
+        top: 2,
+    },
+    {
+        type: "shift",
+        shape: "octagon",
+        displayMode: "number",
+        urgency: "near",
+        time: "21:30:00",
+        top: 2,
+    },
+    {
+        type: "onduty",
+        shape: "octagon",
+        displayMode: "number",
+        urgency: "watch",
+        time: "22:00:00",
+        top: 2,
+    },
+    {
+        type: "cycle",
+        shape: "octagon",
+        displayMode: "number",
+        urgency: "distant",
+        time: "22:30:00",
+        top: 2,
+    },
+];
+
 const ROW_CONFIG: Record<ParentRow, RowConfig> = {
     rest: {
         parent: "rest",
@@ -1444,54 +1496,19 @@ function TimelineRowGroup({
 
                     {parent === "work" &&
                         ((rowMode === "2-row" && subRow.key === "work") ||
-                            (rowMode === "4-row" && subRow.key === "driving")) && (
-                            <>
-                                <ViolationCap
-                                    type="break"
-                                    shape="octagon"
-                                    displayMode="number"
-                                    urgency="triggered"
-                                    left={675}
-                                    top={2}
-                                />
-
-                                <ViolationCap
-                                    type="driving"
-                                    shape="octagon"
-                                    displayMode="number"
-                                    urgency="imminent"
-                                    left={735}
-                                    top={2}
-                                />
-
-                                <ViolationCap
-                                    type="shift"
-                                    shape="octagon"
-                                    displayMode="number"
-                                    urgency="near"
-                                    left={775}
-                                    top={2}
-                                />
-
-                                <ViolationCap
-                                    type="onduty"
-                                    shape="octagon"
-                                    displayMode="number"
-                                    urgency="watch"
-                                    left={800}
-                                    top={2}
-                                />
-
-                                <ViolationCap
-                                    type="cycle"
-                                    shape="octagon"
-                                    displayMode="number"
-                                    urgency="distant"
-                                    left={825}
-                                    top={2}
-                                />
-                            </>
-                        )}
+                            (rowMode === "4-row" && subRow.key === "driving")) &&
+                        scale &&
+                        fixtureViolationCaps.map((cap) => (
+                            <ViolationCap
+                                key={`${cap.type}-${cap.time}`}
+                                type={cap.type}
+                                shape={cap.shape}
+                                displayMode={cap.displayMode}
+                                urgency={cap.urgency}
+                                left={timeToPx(parseFixtureTime(cap.time), scale)}
+                                top={cap.top}
+                            />
+                        ))}
                 </div>
             ))}
         </div>
