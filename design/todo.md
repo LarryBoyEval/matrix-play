@@ -162,24 +162,31 @@
 ## 🧪 Session Notes
 
 ### 2026-04-19
+
 1:10p
 - [x] Clean up suppressed driving display: one color, rename from 'CounterFactual'
+
 12:29p
 - [x] Moved ViolationCaps to a fixture
+
 12:16p
 - [x] Center time labels on their rows in 2 and 4-line mode
   - [x] Restructured main layout to a grid to simplify time label alignment vs. pure divs
 
 ### 2026-04-18
+
 2:43p
 - [x] Tick marks for hours and days now drawing based on time instead of screen width. Small adjustment for 'track' vs 'canvas'.
+
 1:25p
 - [x] Converted several UI timelines to use calculated day widths (24 hr) over hard coded values in prep for multi-day
+
 12:36p
 - [x] Introduced side-scrolling to (oversized) one day grid
 - [x] Moved lables out of scrolling region
 
 ### 2026-04-17
+
 6:06p
 - [x] Use today as current date for demo purposes
 
