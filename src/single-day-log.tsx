@@ -104,7 +104,7 @@ const ROW_LABEL_COLUMN_WIDTH = 120;
 
 const fixtureEvents: DutyEvent[] = [
     { id: "a", kind: "offDuty", time: "00:00:00" },
-    { id: "b", kind: "sleeper", time: "00:30:01" },
+    { id: "b", kind: "sleeper", time: "00:30:00" },
     { id: "c", kind: "offDuty", time: "01:00:00" },
     { id: "d", kind: "onDuty", time: "02:45:00" },
     { id: "e", kind: "driving", time: "09:45:22" },
@@ -737,6 +737,10 @@ function Axis({
     );
 }
 
+function AxisSpacer() {
+    return <div style={{ height: 54 }} />;
+}
+
 function LegendChip({ kind }: { kind: SegmentKind }) {
     const meta = kindMeta[kind];
 
@@ -868,7 +872,7 @@ function TimelineCanvas({
                 width: widthPx,
                 minWidth: "100%",
                 display: "grid",
-                gap: 12,
+                gap: 0,
             }}
         >
             {children}
@@ -1236,13 +1240,16 @@ function RowLabels({
     return (
         <div
             style={{
-                minHeight: 64,
+                minHeight: 88,
+                height: 88,
+                padding: "12px 0",
+                boxSizing: "border-box",
                 display: "grid",
                 gridTemplateColumns: rowMode === "2-row" ? "1fr" : "44px 1fr",
                 gridTemplateRows: rowMode === "2-row" ? "1fr" : "1fr 1fr",
                 columnGap: 8,
-                rowGap: rowMode === "2-row" ? 0 : 8,
-                alignItems: "center",
+                rowGap: 0,
+                alignItems: "stretch",
             }}
         >
             {rowMode === "2-row" ? (
@@ -1253,6 +1260,7 @@ function RowLabels({
                         color: "#475569",
                         display: "flex",
                         alignItems: "center",
+                        height: "100%",
                     }}
                 >
                     {title}
@@ -1267,6 +1275,7 @@ function RowLabels({
                             color: "#475569",
                             display: "flex",
                             alignItems: "center",
+                            height: "100%",
                         }}
                     >
                         {title}
@@ -1281,6 +1290,10 @@ function RowLabels({
                                 color: "#64748b",
                                 textAlign: "right",
                                 whiteSpace: "nowrap",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "flex-end",
+                                height: "100%",
                             }}
                         >
                             {subRow.label}
@@ -1331,7 +1344,8 @@ function TimelineRowGroup({
                 padding: `12px ${TRACK_X_PADDING}px`,
                 display: "grid",
                 gridTemplateRows: rowMode === "2-row" ? "1fr" : "1fr 1fr",
-                gap: rowMode === "2-row" ? 0 : 8,
+                gap: 0,
+                //gap: rowMode === "2-row" ? 0 : 8,
                 position: "relative",
                 overflow: "hidden",
             }}
@@ -1628,20 +1642,21 @@ export default function SingleDayLog() {
                         style={{
                             display: "grid",
                             gridTemplateColumns: `${ROW_LABEL_COLUMN_WIDTH}px 1fr`,
+                            columnGap: 8,
                             alignItems: "start",
-                            gap: 8,
                         }}
                     >
                         <div
                             style={{
                                 display: "grid",
-                                gap: 12,
+                                gridTemplateRows: mode === "proportional" ? "auto auto 54px" : "auto auto",
+                                rowGap: 0,
+                                alignItems: "stretch",
                             }}
                         >
                             <RowLabels parent="rest" rowMode={rowMode} />
                             <RowLabels parent="work" rowMode={rowMode} />
-
-                            {mode === "proportional" ? <div style={{ height: 42 }} /> : null}
+                            {mode === "proportional" ? <AxisSpacer /> : null}
                         </div>
 
                         <TimelineViewport>

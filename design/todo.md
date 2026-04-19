@@ -161,6 +161,11 @@
 
 ## 🧪 Session Notes
 
+### 2026-04-19
+12:16p
+- [x] Center time labels on their rows in 2 and 4-line mode
+  - [x] Restructured main layout to a grid to simplify time label alignment vs. pure divs
+
 ### 2026-04-18
 2:43p
 - [x] Tick marks for hours and days now drawing based on time instead of screen width. Small adjustment for 'track' vs 'canvas'.
