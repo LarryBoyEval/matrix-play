@@ -162,6 +162,8 @@
 ## 🧪 Session Notes
 
 ### 2026-04-19
+1:10p
+- [x] Clean up suppressed driving display: one color, rename from 'CounterFactual'
 12:29p
 - [x] Moved ViolationCaps to a fixture
 12:16p

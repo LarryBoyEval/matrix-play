@@ -91,7 +91,15 @@ Duration = encoded (labels), not necessarily scaled
   - violations
   - thresholds
 - Rest segments may “inflate” visually when relevant
+- Violation detail "inflate" when examined
+  - Like a "ribbon" or projector effect .. rectangle above, pair of lines from wider/thinner source segment (below)
+    to the wider/thinner description above
 
+```
+    | Violation Description |              |   Violation Description   |
+     \|                   |/     or      //                             \\    
+       (Violation Segment )            ( Uncommong long violation segment )
+```
 ---
 
 ## 🎨 Visual Language

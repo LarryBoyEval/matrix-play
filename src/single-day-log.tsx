@@ -104,7 +104,7 @@ const ROW_LABEL_COLUMN_WIDTH = 120;
 
 const fixtureEvents: DutyEvent[] = [
     { id: "a", kind: "offDuty", time: "00:00:00" },
-    { id: "b", kind: "sleeper", time: "00:30:00" },
+    { id: "b", kind: "sleeper", time: "00:30:01" },
     { id: "c", kind: "offDuty", time: "01:00:00" },
     { id: "d", kind: "onDuty", time: "02:45:00" },
     { id: "e", kind: "driving", time: "09:45:22" },
@@ -416,18 +416,12 @@ function getInfluenceColor(
     return "#eab308";
 }
 
-function getCounterfactualTraceColor(
+function getSuppressedDrivingTraceColor(
     kind: InfluenceKind,
     riskLevel: "low" | "medium" | "high" = "low"
 ): string {
-    if (kind === "personalConveyance") {
-        if (riskLevel === "high") return "#8f6d4f";
-        if (riskLevel === "medium") return "#a88b6d";
-        return "#b7a28a";
-    }
-
-    if (riskLevel === "high") return "#7b6753";
-    if (riskLevel === "medium") return "#93826d";
+    void kind
+    void riskLevel
     return "#a79b8a";
 }
 
@@ -1002,7 +996,7 @@ function ProportionalInfluenceOverlay({
     );
 }
 
-function DrivingRowCounterfactualOverlay({
+function DrivingRowSuppressedDrivingOverlay({
     influences,
     scale,
 }: {
@@ -1032,7 +1026,7 @@ function DrivingRowCounterfactualOverlay({
                             top: "50%",
                             transform: "translateY(-50%)",
                             height: 1,
-                            background: getCounterfactualTraceColor(
+                            background: getSuppressedDrivingTraceColor(
                                 influence.kind,
                                 influence.riskLevel ?? "low"
                             ),
@@ -1438,7 +1432,7 @@ function TimelineRowGroup({
                         rowMode === "4-row" &&
                         subRow.key === "driving" &&
                         scale && (
-                            <DrivingRowCounterfactualOverlay
+                            <DrivingRowSuppressedDrivingOverlay
                                 influences={influences}
                                 scale={scale}
                             />
