@@ -1,4 +1,4 @@
-type TimelineLabelKind = "event" | "violation" | "note";
+type TimelineLabelKind = "location" | "event" | "violation" | "note";
 type TimelineLabelPriority = "low" | "medium" | "high";
 
 type TimelineLabelProps = {

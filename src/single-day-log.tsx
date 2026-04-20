@@ -1057,6 +1057,13 @@ function HourGuidelinesOverlay({
         hourMarks.push(second);
     }
 
+    const innerWidthPx = scale.canvasWidthPx - TRACK_X_PADDING * 2;
+
+    function timeToGuidePx(second: number): number {
+        const clamped = Math.max(scale.startSecond, Math.min(scale.endSecond, second));
+        return ((clamped - scale.startSecond) / scale.durationSeconds) * innerWidthPx;
+    }
+
     return (
         <div
             aria-hidden="true"
@@ -1068,10 +1075,10 @@ function HourGuidelinesOverlay({
             }}
         >
             {hourMarks.map((second) => {
-                const rawLeftPx = timeToPx(second, scale);
+                const rawLeftPx = timeToGuidePx(second);
                 const leftPx =
                     second === scale.endSecond
-                        ? Math.max(0, scale.canvasWidthPx - 1)
+                        ? Math.max(0, innerWidthPx - 1)
                         : Math.max(0, rawLeftPx);
 
                 const dayBoundary = second % 86400 === 0;
@@ -1427,7 +1434,7 @@ function TimelineRowGroup({
                 >
                     <TimelineLabel
                         timestamp={9 * 3600}
-                        label="Denver-2mi"
+                        label="Denver·2mi"
                         secondsToPx={(s) => timeToPx(s, scale)}
                         offsetY={0}
                     />
