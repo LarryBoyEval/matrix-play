@@ -3,10 +3,7 @@
 ---
 
 ## 🔥 Next Up (start here every session)
-[ ] Build angled text Widget
-[ ] Build stacked angled text widget
-[ ] Put ticks at bottom of Axis
-[ ] Fix Axis and hour marks (again)
+[ ] Fix hour guidelines on grids ... no padding on right side
 
 
 ### 🧭 Timeline Canvas + Scrolling Architecture (FOUNDATION)
@@ -167,6 +164,9 @@
 ## 🧪 Session Notes
 
 ### 2026-04-19
+
+11:06p
+- [x] Switched ticks and time label stack order (ticks on bottom now)
 
 2:32p
 - [x] Basic TimelineLabel control and smoke test

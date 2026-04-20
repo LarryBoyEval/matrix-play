@@ -758,14 +758,6 @@ function Axis({
                         >
                             <div
                                 style={{
-                                    width: 0,
-                                    height: 10,
-                                    margin: "0 auto",
-                                    borderLeft: "1px solid #94a3b8",
-                                }}
-                            />
-                            <div
-                                style={{
                                     marginTop: 4,
                                     fontSize: 10,
                                     color: "#64748b",
@@ -776,6 +768,14 @@ function Axis({
                             >
                                 {formatHourLabel(second)}
                             </div>
+                            <div
+                                style={{
+                                    width: 0,
+                                    height: 10,
+                                    margin: "0 auto",
+                                    borderLeft: "1px solid #94a3b8",
+                                }}
+                            />
                         </div>
                     );
                 })}
