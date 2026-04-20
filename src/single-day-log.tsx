@@ -651,12 +651,12 @@ function formatClock(totalSeconds: number): string {
 
     const hours24 = Math.floor(secondsIntoDay / 3600);
     const minutes = Math.floor((secondsIntoDay % 3600) / 60);
+    const seconds = secondsIntoDay % 60;
 
     const suffix = hours24 >= 12 ? "PM" : "AM";
     const hour12 = hours24 % 12 === 0 ? 12 : hours24 % 12;
 
-    const base = `${formatMonthDayFromOffset(day)} ${hour12}:${String(minutes).padStart(2, "0")} ${suffix}`;
-    return base;
+    return `${formatMonthDayFromOffset(day)} ${hour12}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")} ${suffix}`;
 }
 
 function estimateLabelWidth(label: string): number {
