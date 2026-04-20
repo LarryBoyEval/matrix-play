@@ -3,6 +3,11 @@
 ---
 
 ## 🔥 Next Up (start here every session)
+[ ] Build angled text Widget
+[ ] Build stacked angled text widget
+[ ] Put ticks at bottom of Axis
+[ ] Fix Axis and hour marks (again)
+
 
 ### 🧭 Timeline Canvas + Scrolling Architecture (FOUNDATION)
 
@@ -162,6 +167,9 @@
 ## 🧪 Session Notes
 
 ### 2026-04-19
+
+2:32p
+- [x] Basic TimelineLabel control and smoke test
 
 1:10p
 - [x] Clean up suppressed driving display: one color, rename from 'CounterFactual'

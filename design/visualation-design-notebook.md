@@ -361,6 +361,32 @@ Core assumption for this visualization system:
   - 60 min PC should remain visually significant even inside a very large containing segment
 - Percentage of containing segment may still be analytically useful later, but should not drive first-pass display emphasis
 
+#### 5. Location, Distance, Bearing 
+
+### Potential Formats
+
+**Possible compact formats:**
+
+```
+Denver, CO · 3 mi
+Denver,CO·3mi
+Denver,CO (3mi)
+Denver,CO (3mi SSW)
+```
+
+**Rationale:**
+
+* **City-first** supports truncation and quick visual scanning
+* Middle dot (`·`) provides clean separation without adding visual weight
+* Distance remains clearly associated without implying uncertainty
+
+**Guidelines:**
+
+- Use abbreviated units (`mi`, `km`)
+- Avoid symbols like `±` unless indicating uncertainty
+- Prefer compact format in dense UI contexts (timelines, labels, chips)
+
+
 
 ---
 

@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import ViolationCap from "./ViolationCap";
+import { TimelineLabel } from "./TimelineLabel";
 
 type SegmentKind = "driving" | "onDuty" | "sleeper" | "offDuty";
 type DisplayMode = "compressed" | "proportional";
@@ -1412,6 +1413,25 @@ function TimelineRowGroup({
                 >
                     <HourGuidelinesOverlay scale={scale} />
                 </div>
+            )}
+
+            {mode === "proportional" && scale && (
+                <svg
+                    style={{
+                        position: "absolute",
+                        inset: `12px ${TRACK_X_PADDING}px`,
+                        pointerEvents: "none",
+                        zIndex: 2, // above guidelines, below caps if needed
+                        overflow: "visible",
+                    }}
+                >
+                    <TimelineLabel
+                        timestamp={9 * 3600}
+                        label="Denver-2mi"
+                        secondsToPx={(s) => timeToPx(s, scale)}
+                        offsetY={0}
+                    />
+                </svg>
             )}
 
             {subRows.map((subRow) => (
