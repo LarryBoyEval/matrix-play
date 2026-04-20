@@ -4,8 +4,9 @@
 
 ## 🔥 Next Up (start here every session)
 - [ ] Switch to 9 day view (8 day + tomorrow)
-  - [ ] Base view today - 8 days
-  - [ ] Focus on today
+  - [x] Base view today - 8 days
+  - [x] Focus on today
+  - [ ] 
 - [ ] Draw Day indicators
 
 ### 🧭 Timeline Canvas + Scrolling Architecture (FOUNDATION)
@@ -166,6 +167,10 @@
 ## 🧪 Session Notes
 
 ### 2026-04-20
+
+2:12
+- [x] Converted to 9-day timeline view (today + 7day prior, 1 day after)
+- [x] Scroll to today
 
 1:01p
 - [x] Remove mini ticks from Axis

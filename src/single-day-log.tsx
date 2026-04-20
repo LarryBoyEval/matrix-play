@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useEffect, useRef, useState } from "react";
 import ViolationCap from "./ViolationCap";
 import { TimelineLabel } from "./TimelineLabel";
 
@@ -125,16 +125,19 @@ function timeToPx(second: number, scale: TimelineScale): number {
 
 const TRACK_X_PADDING = 8;
 const ROW_LABEL_COLUMN_WIDTH = 120;
+const DAY_SECONDS = 86400;
+const DAYS_BEFORE_FOCUS = 7;
+const DAYS_AFTER_FOCUS = 1;
 
 const fixtureEvents: DutyEvent[] = [
-    { id: "a", kind: "offDuty", time: "00:00:00" },
-    { id: "b", kind: "sleeper", time: "00:30:01" },
-    { id: "c", kind: "offDuty", time: "01:00:00" },
+    { id: "a", kind: "offDuty", time: "-1d20:00:00" },
+    { id: "b", kind: "sleeper", time: "-1d22:00:00" },
+    { id: "c", kind: "offDuty", time: "00:00:00" },
     { id: "d", kind: "onDuty", time: "02:45:00" },
     { id: "e", kind: "driving", time: "09:45:22" },
     { id: "f", kind: "onDuty", time: "19:45:00" },
     { id: "g", kind: "sleeper", time: "23:45:00" },
-    { id: "h", kind: "offDuty", time: "1d00:00:00" },
+    { id: "h", kind: "offDuty", time: "1d08:00:00" },
 ];
 
 const fixtureInfluences: InfluenceInterval[] = [
@@ -305,18 +308,31 @@ function getTierPadding(minutes: number): number {
 
 function parseFixtureTime(value: string): number {
     const trimmed = value.trim();
-    const match = trimmed.match(/^(?:(\d+)d)?(\d{1,2}):(\d{2}):(\d{2})$/);
+    const match = trimmed.match(/^([+-]?\d+)d(\d{1,2}):(\d{2}):(\d{2})$|^(\d{1,2}):(\d{2}):(\d{2})$/);
 
     if (!match) {
         throw new Error(`Invalid fixture time: ${value}`);
     }
 
-    const [, dayPart, hourPart, minutePart, secondPart] = match;
+    if (match[1] != null) {
+        const days = Number(match[1]);
+        const hours = Number(match[2]);
+        const minutes = Number(match[3]);
+        const seconds = Number(match[4]);
 
-    const days = dayPart ? Number(dayPart) : 0;
-    const hours = Number(hourPart);
-    const minutes = Number(minutePart);
-    const seconds = Number(secondPart);
+        if (hours > 23) {
+            throw new Error(`Hour must be 00-23 in fixture time: ${value}`);
+        }
+        if (minutes > 59 || seconds > 59) {
+            throw new Error(`Minute/second out of range in fixture time: ${value}`);
+        }
+
+        return days * 86400 + hours * 3600 + minutes * 60 + seconds;
+    }
+
+    const hours = Number(match[5]);
+    const minutes = Number(match[6]);
+    const seconds = Number(match[7]);
 
     if (hours > 23) {
         throw new Error(`Hour must be 00-23 in fixture time: ${value}`);
@@ -325,7 +341,7 @@ function parseFixtureTime(value: string): number {
         throw new Error(`Minute/second out of range in fixture time: ${value}`);
     }
 
-    return days * 86400 + hours * 3600 + minutes * 60 + seconds;
+    return hours * 3600 + minutes * 60 + seconds;
 }
 
 function buildSegments(
@@ -661,16 +677,6 @@ function getCompressedWidths(segments: Segment[]): Record<string, number> {
     );
 }
 
-function getSegmentWidths(
-    segment: Segment,
-    compressedWidths: Record<string, number>
-) {
-    return {
-        proportionalWidth: (getDurationSeconds(segment) / 86400) * 100,
-        compressedWidth: compressedWidths[segment.id],
-    };
-}
-
 function segmentBelongsToRow(
     segment: Segment,
     rowKey: SubRowKey,
@@ -925,11 +931,22 @@ function SegmentDetails({ segment }: { segment: Segment | null }) {
 
 function TimelineViewport({
     children,
+    initialScrollLeft,
 }: {
     children: React.ReactNode;
+    initialScrollLeft?: number;
 }) {
+    const viewportRef = useRef<HTMLDivElement | null>(null);
+
+    useEffect(() => {
+        if (!viewportRef.current || initialScrollLeft == null) return;
+
+        viewportRef.current.scrollLeft = initialScrollLeft;
+    }, [initialScrollLeft]);
+
     return (
         <div
+            ref={viewportRef}
             style={{
                 overflowX: "auto",
                 overflowY: "hidden",
@@ -1477,11 +1494,21 @@ function TimelineRowGroup({
                             />
                         )}
 
+                    {mode === "proportional" && scale && segments.length > 0
+                        ? renderSpacer(
+                            `${subRow.key}-leading`,
+                            ((segments[0].startSecond - scale.startSecond) / scale.durationSeconds) * 100,
+                            0,
+                            mode
+                        )
+                        : null}
+
                     {segments.map((segment) => {
-                        const { proportionalWidth, compressedWidth } = getSegmentWidths(
-                            segment,
-                            compressedWidths
-                        );
+                        const proportionalWidth =
+                            mode === "proportional" && scale
+                                ? (getDurationSeconds(segment) / scale.durationSeconds) * 100
+                                : 0;
+                        const compressedWidth = compressedWidths[segment.id];
 
                         if (segmentBelongsToRow(segment, subRow.key, rowMode)) {
                             if (isRestParent) {
@@ -1527,6 +1554,15 @@ function TimelineRowGroup({
                         );
                     })}
 
+                {mode === "proportional" && scale && segments.length > 0
+                    ? renderSpacer(
+                        `${subRow.key}-trailing`,
+                        ((scale.endSecond - segments[segments.length - 1].endSecond) / scale.durationSeconds) * 100,
+                        0,
+                        mode
+                    )
+                    : null}    
+
                     {parent === "work" &&
                         ((rowMode === "2-row" && subRow.key === "work") ||
                             (rowMode === "4-row" && subRow.key === "driving")) &&
@@ -1566,18 +1602,26 @@ export default function SingleDayLog() {
     const compressedWidths = useMemo(() => getCompressedWidths(segments), [segments]);
     const activeSegment = segments.find((segment) => segment.id === activeId) ?? null;
     const pixelsPerHour = 60;
-    const visibleHours = 24;
-    const proportionalCanvasWidth = pixelsPerHour * visibleHours;
     const compressedCanvasWidth = 60 * 24; // temp
 
     const timelineScale = useMemo(
-        () => buildTimelineScale(0, 86400, pixelsPerHour),
+        () =>
+            buildTimelineScale(
+                -DAYS_BEFORE_FOCUS * DAY_SECONDS,
+                (DAYS_AFTER_FOCUS + 1) * DAY_SECONDS,
+                pixelsPerHour
+            ),
         []
     );
-
+    const proportionalCanvasWidth = timelineScale.canvasWidthPx;
 
     const timelineCanvasWidth =
         mode === "proportional" ? proportionalCanvasWidth : compressedCanvasWidth;
+
+    const initialScrollLeft = useMemo(
+        () => timeToPx(0, timelineScale),
+        [timelineScale]
+    );
 
     return (
         <div
@@ -1600,7 +1644,7 @@ export default function SingleDayLog() {
             >
                 <div style={{ display: "grid", gap: 8 }}>
                     <h1 style={{ margin: 0, fontSize: 30, fontWeight: 700 }}>
-                        Log Grid Proof of Concept
+                        Log Grid Proof of Concept.
                     </h1>
                     <p
                         style={{
@@ -1709,7 +1753,7 @@ export default function SingleDayLog() {
                             {mode === "proportional" ? <AxisSpacer /> : null}
                         </div>
 
-                        <TimelineViewport>
+                        <TimelineViewport initialScrollLeft={mode === "proportional" ? initialScrollLeft : undefined}>
                             <TimelineCanvas widthPx={timelineCanvasWidth}>
                                 <TimelineRowGroup
                                     parent="rest"
