@@ -163,6 +163,9 @@
 
 ### 2026-04-20
 
+4:24p
+- [x] Changed timespans over 24 hours to include 'days' (d) values also instead of just many hours
+
 4:15p
 - [x] Fixed status panel to show seconds for Start/Finish
 

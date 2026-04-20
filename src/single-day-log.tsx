@@ -131,7 +131,7 @@ const DAYS_AFTER_FOCUS = 1;
 
 const fixtureEvents: DutyEvent[] = [
     { id: "a", kind: "offDuty", time: "-7d00:00:00" },
-    { id: "b", kind: "sleeper", time: "-1d22:00:00" },
+    { id: "b", kind: "sleeper", time: "-1d22:00:01" },
     { id: "c", kind: "offDuty", time: "00:00:00" },
     { id: "d", kind: "onDuty", time: "02:45:00" },
     { id: "e", kind: "driving", time: "09:45:22" },
@@ -553,15 +553,31 @@ function getSegmentInfluenceSlices(
 }
 
 function formatDurationLabelCompact(totalSeconds: number): string {
-    const totalMinutes = Math.floor(totalSeconds / 60);
+    const roundedSeconds = Math.max(0, Math.round(totalSeconds));
+    const totalMinutes = Math.floor(roundedSeconds / 60);
 
     if (totalMinutes < 30) return "";
 
-    const hours = Math.floor(totalMinutes / 60);
-    const minutes = totalMinutes % 60;
+    const days = Math.floor(roundedSeconds / DAY_SECONDS);
+    const hours = Math.floor((roundedSeconds % DAY_SECONDS) / 3600);
+    const minutes = Math.floor((roundedSeconds % 3600) / 60);
+    const seconds = roundedSeconds % 60;
+
+    if (days > 0) {
+        if (hours === 0 && minutes === 0) {
+            const hasExtraSeconds = seconds > 0;
+            return `${days}d${hasExtraSeconds ? "+" : ""}`;
+        }
+
+        if (hours > 0) {
+            return `${days}d ${hours}h`;
+        }
+
+        return `${days}d ${minutes}m`;
+    }
 
     if (minutes === 0 && hours > 0) {
-        const hasExtraSeconds = totalSeconds % 60 > 0;
+        const hasExtraSeconds = seconds > 0;
         return `${hours}h${hasExtraSeconds ? "+" : ""}`;
     }
 
@@ -575,23 +591,20 @@ function formatDurationLabelCompact(totalSeconds: number): string {
 function formatDurationLabelFull(totalSeconds: number): string {
     const roundedSeconds = Math.max(0, Math.round(totalSeconds));
 
-    const hours = Math.floor(roundedSeconds / 3600);
+    const days = Math.floor(roundedSeconds / DAY_SECONDS);
+    const hours = Math.floor((roundedSeconds % DAY_SECONDS) / 3600);
     const minutes = Math.floor((roundedSeconds % 3600) / 60);
     const seconds = roundedSeconds % 60;
 
-    if (hours > 0) {
-        if (minutes === 0 && seconds === 0) return `${hours}h`;
-        if (minutes === 0) return `${hours}h ${seconds}s`;
-        if (seconds === 0) return `${hours}h ${minutes}m`;
-        return `${hours}h ${minutes}m ${seconds}s`;
-    }
+    // Build parts in order, skipping zero units where appropriate
+    const parts: string[] = [];
 
-    if (minutes > 0) {
-        if (seconds === 0) return `${minutes}m`;
-        return `${minutes}m ${seconds}s`;
-    }
+    if (days > 0) parts.push(`${days}d`);
+    if (hours > 0) parts.push(`${hours}h`);
+    if (minutes > 0) parts.push(`${minutes}m`);
+    if (seconds > 0 || parts.length === 0) parts.push(`${seconds}s`);
 
-    return `${seconds}s`;
+    return parts.join(" ");
 }
 
 function formatClockShort(totalSeconds: number): string {
