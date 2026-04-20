@@ -66,12 +66,26 @@ type GridHighlight = {
     opacity: number;
 };
 
+type TimelineLabelFixture = {
+    time: string;
+    label: string;
+};
+
 type TimelineScale = {
     startSecond: number;
     endSecond: number;
     durationSeconds: number;
     pixelsPerHour: number;
     canvasWidthPx: number;
+};
+
+type ViolationCapFixture = {
+    type: "break" | "driving" | "shift" | "onduty" | "cycle";
+    shape: "octagon";
+    displayMode: "number";
+    urgency: "triggered" | "imminent" | "near" | "watch" | "distant";
+    time: string;
+    top: number;
 };
 
 function buildTimelineScale(
@@ -165,14 +179,6 @@ const fixtureGridHighlightInputs: GridHighlightInput[] = [
     },
 ];
 
-type ViolationCapFixture = {
-    type: "break" | "driving" | "shift" | "onduty" | "cycle";
-    shape: "octagon";
-    displayMode: "number";
-    urgency: "triggered" | "imminent" | "near" | "watch" | "distant";
-    time: string;
-    top: number;
-};
 
 const fixtureViolationCaps: ViolationCapFixture[] = [
     {
@@ -215,6 +221,14 @@ const fixtureViolationCaps: ViolationCapFixture[] = [
         time: "22:30:00",
         top: 2,
     },
+];
+
+const fixtureTimelineLabels: TimelineLabelFixture[] = [
+    { time: "09:00:00", label: "Greeley,CO·2mi" },
+    { time: "10:05:00", label: "Denver,CO 2mi" },
+    { time: "13:00:00", label: "Limon,CO · 4mi SSW" },
+    { time: "18:30:00", label: "San Franscisco CA 13m" },
+    { time: "19:30:00", label: "San Franscisco,CA 13mi" },
 ];
 
 const ROW_CONFIG: Record<ParentRow, RowConfig> = {
@@ -692,8 +706,10 @@ function renderSpacer(
 
 function Axis({
     scale,
+    labels,
 }: {
     scale: TimelineScale;
+    labels: TimelineLabelFixture[];
 }) {
     function formatHourLabel(totalSecond: number): string {
         const secondsIntoDay = ((totalSecond % 86400) + 86400) % 86400;
@@ -720,11 +736,15 @@ function Axis({
         ticks.push(second);
     }
 
+    const AXIS_HEIGHT = 140;
+    const AXIS_TICK_BAND_HEIGHT = 22;
+    const AXIS_LABEL_BAND_TOP = 22;
+
     return (
         <div
             style={{
-                marginTop: 12,
-                height: 42,
+                marginTop: 0,
+                height: AXIS_HEIGHT,
                 width: scale.canvasWidthPx,
                 boxSizing: "border-box",
                 flex: "0 0 auto",
@@ -735,9 +755,9 @@ function Axis({
                 style={{
                     position: "absolute",
                     top: 0,
-                    bottom: 0,
                     left: TRACK_X_PADDING,
                     right: TRACK_X_PADDING,
+                    height: AXIS_TICK_BAND_HEIGHT,
                 }}
             >
                 {ticks.map((second) => {
@@ -783,12 +803,34 @@ function Axis({
                     );
                 })}
             </div>
+
+            <svg
+                style={{
+                    position: "absolute",
+                    top: AXIS_LABEL_BAND_TOP + 3,
+                    left: TRACK_X_PADDING,
+                    right: TRACK_X_PADDING,
+                    height: AXIS_HEIGHT - AXIS_LABEL_BAND_TOP,
+                    pointerEvents: "none",
+                    overflow: "visible",
+                }}
+            >
+                {labels.map((item) => (
+                    <TimelineLabel
+                        key={`${item.time}-${item.label}`}
+                        timestamp={parseFixtureTime(item.time)}
+                        label={item.label}
+                        secondsToPx={(s) => timeToPx(s, scale)}
+                        offsetY={0}
+                    />
+                ))}
+            </svg>
         </div>
     );
 }
 
 function AxisSpacer() {
-    return <div style={{ height: 54 }} />;
+    return <div style={{ height: 140 }} />;
 }
 
 function LegendChip({ kind }: { kind: SegmentKind }) {
@@ -1419,25 +1461,6 @@ function TimelineRowGroup({
                 </div>
             )}
 
-            {mode === "proportional" && scale && (
-                <svg
-                    style={{
-                        position: "absolute",
-                        inset: `12px ${TRACK_X_PADDING}px`,
-                        pointerEvents: "none",
-                        zIndex: 2, // above guidelines, below caps if needed
-                        overflow: "visible",
-                    }}
-                >
-                    <TimelineLabel
-                        timestamp={9 * 3600}
-                        label="Denver·2mi"
-                        secondsToPx={(s) => timeToPx(s, scale)}
-                        offsetY={0}
-                    />
-                </svg>
-            )}
-
             {subRows.map((subRow) => (
                 <div
                     key={subRow.key}
@@ -1722,7 +1745,12 @@ export default function SingleDayLog() {
                                     onActivate={setActiveId}
                                 />
 
-                                {mode === "proportional" && <Axis scale={timelineScale} />}
+                                {mode === "proportional" && (
+                                    <Axis
+                                        scale={timelineScale}
+                                        labels={fixtureTimelineLabels}
+                                    />
+                                )}
                             </TimelineCanvas>
                         </TimelineViewport>
                     </div>

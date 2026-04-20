@@ -19,7 +19,7 @@ function getTimelineLabelColor(
     void kind;
     void priority;
 
-    return "#2f2f2f";
+    return "#64748b";
 }
 
 export function TimelineLabel({

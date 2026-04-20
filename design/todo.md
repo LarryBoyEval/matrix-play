@@ -4,7 +4,6 @@
 
 ## 🔥 Next Up (start here every session)
 
-
 ### 🧭 Timeline Canvas + Scrolling Architecture (FOUNDATION)
 
 #### Pass 1 — Layout Refactor (no time math changes yet)
@@ -163,6 +162,10 @@
 ## 🧪 Session Notes
 
 ### 2026-04-20
+
+12:11p
+[x] Add space for TimeLabels to show cities
+[x] Add Fixture for some cities to display
 
 10:16a 
 - [x] Refactored all times to inner track grid. AI noticed one misalignment to outer canvas which was
