@@ -1723,16 +1723,12 @@ export default function SingleDayLog() {
                                 Proportional
                             </ToolbarButton>
                             <ToolbarButton
-                                active={rowMode === "2-row"}
-                                onClick={() => setRowMode("2-row")}
+                                active={false}
+                                onClick={() =>
+                                    setRowMode((value) => (value === "2-row" ? "4-row" : "2-row"))
+                                }
                             >
-                                2 Rows
-                            </ToolbarButton>
-                            <ToolbarButton
-                                active={rowMode === "4-row"}
-                                onClick={() => setRowMode("4-row")}
-                            >
-                                4 Rows
+                                {rowMode === "2-row" ? "4 Rows" : "2 Rows"}
                             </ToolbarButton>
                         </div>
                     </div>
