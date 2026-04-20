@@ -327,7 +327,7 @@ function parseFixtureTime(value: string): number {
             throw new Error(`Minute/second out of range in fixture time: ${value}`);
         }
 
-        return days * 86400 + hours * 3600 + minutes * 60 + seconds;
+        return days * DAY_SECONDS + hours * 3600 + minutes * 60 + seconds;
     }
 
     const hours = Number(match[5]);
@@ -378,7 +378,7 @@ function buildGridHighlights(inputs: GridHighlightInput[]): GridHighlight[] {
 }
 
 // function clampDayPercent(second: number): number {
-//     return Math.max(0, Math.min(100, (second / 86400) * 100));
+//     return Math.max(0, Math.min(100, (second / DAY_SECONDS) * 100));
 // }
 
 function GridHighlightsOverlay({
@@ -717,7 +717,7 @@ function Axis({
     labels: TimelineLabelFixture[];
 }) {
     function formatHourLabel(totalSecond: number): string {
-        const secondsIntoDay = ((totalSecond % 86400) + 86400) % 86400;
+        const secondsIntoDay = ((totalSecond % DAY_SECONDS) + DAY_SECONDS) % DAY_SECONDS;
         const hour = Math.floor(secondsIntoDay / 3600);
 
         if (hour === 0) return "12a";
@@ -1128,7 +1128,7 @@ function HourGuidelinesOverlay({
                         ? Math.max(0, trackWidthPx - 1)
                         : Math.max(0, rawLeftPx);
 
-                const dayBoundary = second % 86400 === 0;
+                const dayBoundary = second % DAY_SECONDS === 0;
 
                 return (
                     <div
