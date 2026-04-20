@@ -130,7 +130,7 @@ const DAYS_BEFORE_FOCUS = 7;
 const DAYS_AFTER_FOCUS = 1;
 
 const fixtureEvents: DutyEvent[] = [
-    { id: "a", kind: "offDuty", time: "-1d20:00:00" },
+    { id: "a", kind: "offDuty", time: "-7d00:00:00" },
     { id: "b", kind: "sleeper", time: "-1d22:00:00" },
     { id: "c", kind: "offDuty", time: "00:00:00" },
     { id: "d", kind: "onDuty", time: "02:45:00" },
@@ -221,7 +221,7 @@ const fixtureViolationCaps: ViolationCapFixture[] = [
         shape: "octagon",
         displayMode: "number",
         urgency: "distant",
-        time: "22:30:00",
+        time: "1d22:30:00",
         top: 2,
     },
 ];
@@ -231,7 +231,7 @@ const fixtureTimelineLabels: TimelineLabelFixture[] = [
     { time: "10:05:00", label: "Denver,CO 2mi" },
     { time: "13:00:00", label: "Limon,CO · 4mi SSW" },
     { time: "18:30:00", label: "San Franscisco CA 13m" },
-    { time: "19:30:00", label: "San Franscisco,CA 13mi" },
+    { time: "1d19:30:00", label: "San Franscisco,CA 13mi" },
 ];
 
 const ROW_CONFIG: Record<ParentRow, RowConfig> = {
@@ -595,7 +595,8 @@ function formatDurationLabelFull(totalSeconds: number): string {
 }
 
 function formatClockShort(totalSeconds: number): string {
-    const secondsIntoDay = totalSeconds % 86400;
+    const secondsIntoDay =
+        ((totalSeconds % DAY_SECONDS) + DAY_SECONDS) % DAY_SECONDS;
 
     const hours24 = Math.floor(secondsIntoDay / 3600);
     const minutes = Math.floor((secondsIntoDay % 3600) / 60);
@@ -621,19 +622,16 @@ function formatMonthDayFromOffset(dayOffset: number): string {
 }
 
 function formatSegmentTimeRange(startSecond: number, endSecond: number): string {
-    const startDay = Math.floor(startSecond / 86400);
-    const endDay = Math.floor(endSecond / 86400);
+    const startDay = Math.floor(startSecond / DAY_SECONDS);
+    const endDay = Math.floor(endSecond / DAY_SECONDS);
 
     if (startDay === endDay) {
-        return `${formatClockShort(startSecond)}-${formatClockShort(endSecond)}`;
+        return `${formatMonthDayFromOffset(startDay)} ${formatClockShort(startSecond)}-${formatClockShort(endSecond)}`;
     }
 
-    const startSecondsIntoDay = startSecond % 86400;
-    const endSecondsIntoDay = endSecond % 86400;
-
     return `${formatMonthDayFromOffset(startDay)} ${formatClockShort(
-        startSecondsIntoDay
-    )} - ${formatMonthDayFromOffset(endDay)} ${formatClockShort(endSecondsIntoDay)}`;
+        startSecond
+    )} - ${formatMonthDayFromOffset(endDay)} ${formatClockShort(endSecond)}`;
 }
 
 function getSegmentHint(segment: Segment): string {
@@ -647,8 +645,9 @@ function getSegmentHint(segment: Segment): string {
 }
 
 function formatClock(totalSeconds: number): string {
-    const day = Math.floor(totalSeconds / 86400);
-    const secondsIntoDay = totalSeconds % 86400;
+    const day = Math.floor(totalSeconds / DAY_SECONDS);
+    const secondsIntoDay =
+        ((totalSeconds % DAY_SECONDS) + DAY_SECONDS) % DAY_SECONDS;
 
     const hours24 = Math.floor(secondsIntoDay / 3600);
     const minutes = Math.floor((secondsIntoDay % 3600) / 60);
@@ -656,8 +655,8 @@ function formatClock(totalSeconds: number): string {
     const suffix = hours24 >= 12 ? "PM" : "AM";
     const hour12 = hours24 % 12 === 0 ? 12 : hours24 % 12;
 
-    const base = `${hour12}:${String(minutes).padStart(2, "0")} ${suffix}`;
-    return day > 0 ? `+${day}d ${base}` : base;
+    const base = `${formatMonthDayFromOffset(day)} ${hour12}:${String(minutes).padStart(2, "0")} ${suffix}`;
+    return base;
 }
 
 function estimateLabelWidth(label: string): number {
@@ -1601,7 +1600,7 @@ export default function SingleDayLog() {
 
     const compressedWidths = useMemo(() => getCompressedWidths(segments), [segments]);
     const activeSegment = segments.find((segment) => segment.id === activeId) ?? null;
-    const pixelsPerHour = 60;
+    const pixelsPerHour = 35;
     const compressedCanvasWidth = 60 * 24; // temp
 
     const timelineScale = useMemo(
