@@ -95,9 +95,18 @@ function clampToScale(second: number, scale: TimelineScale): number {
     return Math.max(scale.startSecond, Math.min(scale.endSecond, second));
 }
 
+function getTrackWidthPx(scale: TimelineScale): number {
+    return scale.canvasWidthPx - TRACK_X_PADDING * 2;
+}
+
 function timeToPx(second: number, scale: TimelineScale): number {
+    const trackWidthPx = getTrackWidthPx(scale);
     const clamped = clampToScale(second, scale);
-    return ((clamped - scale.startSecond) / scale.durationSeconds) * scale.canvasWidthPx;
+
+    return (
+        ((clamped - scale.startSecond) / scale.durationSeconds) *
+        trackWidthPx
+    );
 }
 
 const TRACK_X_PADDING = 8;
@@ -711,13 +720,6 @@ function Axis({
         ticks.push(second);
     }
 
-    const innerWidthPx = scale.canvasWidthPx - TRACK_X_PADDING * 2;
-
-    function timeToAxisPx(second: number): number {
-        const clamped = Math.max(scale.startSecond, Math.min(scale.endSecond, second));
-        return ((clamped - scale.startSecond) / scale.durationSeconds) * innerWidthPx;
-    }
-
     return (
         <div
             style={{
@@ -739,10 +741,11 @@ function Axis({
                 }}
             >
                 {ticks.map((second) => {
-                    const rawLeftPx = timeToAxisPx(second);
+                    const trackWidthPx = getTrackWidthPx(scale);
+                    const rawLeftPx = timeToPx(second, scale);
                     const leftPx =
                         second === scale.endSecond
-                            ? Math.max(0, innerWidthPx - 1)
+                            ? Math.max(0, trackWidthPx - 1)
                             : Math.max(0, rawLeftPx);
 
                     return (
@@ -1057,13 +1060,6 @@ function HourGuidelinesOverlay({
         hourMarks.push(second);
     }
 
-    const innerWidthPx = scale.canvasWidthPx - TRACK_X_PADDING * 2;
-
-    function timeToGuidePx(second: number): number {
-        const clamped = Math.max(scale.startSecond, Math.min(scale.endSecond, second));
-        return ((clamped - scale.startSecond) / scale.durationSeconds) * innerWidthPx;
-    }
-
     return (
         <div
             aria-hidden="true"
@@ -1075,10 +1071,11 @@ function HourGuidelinesOverlay({
             }}
         >
             {hourMarks.map((second) => {
-                const rawLeftPx = timeToGuidePx(second);
+                const trackWidthPx = getTrackWidthPx(scale);
+                const rawLeftPx = timeToPx(second, scale);
                 const leftPx =
                     second === scale.endSecond
-                        ? Math.max(0, innerWidthPx - 1)
+                        ? Math.max(0, trackWidthPx - 1)
                         : Math.max(0, rawLeftPx);
 
                 const dayBoundary = second % 86400 === 0;
