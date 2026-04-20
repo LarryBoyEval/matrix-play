@@ -791,14 +791,6 @@ function Axis({
                             >
                                 {formatHourLabel(second)}
                             </div>
-                            <div
-                                style={{
-                                    width: 0,
-                                    height: 10,
-                                    margin: "0 auto",
-                                    borderLeft: "1px solid #94a3b8",
-                                }}
-                            />
                         </div>
                     );
                 })}
@@ -1127,13 +1119,13 @@ function HourGuidelinesOverlay({
                         key={second}
                         style={{
                             position: "absolute",
-                            left: leftPx,
+                            left: leftPx - 0.5,
                             top: 0,
                             bottom: 0,
-                            width: 0,
-                            borderLeft: dayBoundary
-                                ? "1px solid rgba(15, 23, 42, 0.14)"
-                                : "1px solid rgba(15, 23, 42, 0.06)",
+                            width: 1,
+                            background: dayBoundary
+                                ? "rgba(15, 23, 42, 0.14)"
+                                : "rgba(15, 23, 42, 0.06)",
                         }}
                     />
                 );
@@ -1452,7 +1444,7 @@ function TimelineRowGroup({
                     aria-hidden="true"
                     style={{
                         position: "absolute",
-                        inset: `12px ${TRACK_X_PADDING}px`,
+                        inset: `0px ${TRACK_X_PADDING}px`,
                         pointerEvents: "none",
                         zIndex: 0,
                     }}

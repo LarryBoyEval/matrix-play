@@ -3,6 +3,10 @@
 ---
 
 ## 🔥 Next Up (start here every session)
+- [ ] Switch to 9 day view (8 day + tomorrow)
+  - [ ] Base view today - 8 days
+  - [ ] Focus on today
+- [ ] Draw Day indicators
 
 ### 🧭 Timeline Canvas + Scrolling Architecture (FOUNDATION)
 
@@ -163,9 +167,13 @@
 
 ### 2026-04-20
 
+1:01p
+- [x] Remove mini ticks from Axis
+- [x] Make grid hour guides full-height
+
 12:11p
-[x] Add space for TimeLabels to show cities
-[x] Add Fixture for some cities to display
+- [x] Add space for TimeLabels to show cities
+- [x] Add Fixture for some cities to display
 
 10:16a 
 - [x] Refactored all times to inner track grid. AI noticed one misalignment to outer canvas which was
