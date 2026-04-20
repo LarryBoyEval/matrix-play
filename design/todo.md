@@ -162,6 +162,13 @@
 
 ## 🧪 Session Notes
 
+### 2026-04-20
+
+10:16a 
+- [x] Refactored all times to inner track grid. AI noticed one misalignment to outer canvas which was
+  a significant drift bug that needed attention
+
+
 ### 2026-04-19
 
 11:20p 
