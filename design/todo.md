@@ -175,7 +175,7 @@
 ### 2026-04-19
 
 11:20p 
-[x] Fix hour guidelines on grids ... no padding on right side (actually math/alignment issue)
+- [x] Fix hour guidelines on grids ... no padding on right side (actually math/alignment issue)
 
 11:06p
 - [x] Switched ticks and time label stack order (ticks on bottom now)
