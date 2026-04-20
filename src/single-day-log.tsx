@@ -720,7 +720,11 @@ function Axis({
         const secondsIntoDay = ((totalSecond % DAY_SECONDS) + DAY_SECONDS) % DAY_SECONDS;
         const hour = Math.floor(secondsIntoDay / 3600);
 
-        if (hour === 0) return "12a";
+        const dayOffset = Math.floor(totalSecond / DAY_SECONDS);
+        
+
+        if (hour === 0) return formatMonthDayFromOffset(dayOffset);
+
         if (hour === 12) return "N";
 
         if (hour >= 13 && hour <= 21) return `${hour - 12}p`;
@@ -772,6 +776,7 @@ function Axis({
                         second === scale.endSecond
                             ? Math.max(0, trackWidthPx - 1)
                             : Math.max(0, rawLeftPx);
+                    const isMidnight = ((second % DAY_SECONDS) + DAY_SECONDS) % DAY_SECONDS === 0;
 
                     return (
                         <div
@@ -792,6 +797,7 @@ function Axis({
                                     whiteSpace: "nowrap",
                                     textAlign: "center",
                                     minWidth: 16,
+                                    fontWeight: isMidnight ? 700 : 400,
                                 }}
                             >
                                 {formatHourLabel(second)}

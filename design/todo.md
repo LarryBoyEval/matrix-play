@@ -3,11 +3,6 @@
 ---
 
 ## 🔥 Next Up (start here every session)
-- [ ] Switch to 9 day view (8 day + tomorrow)
-  - [x] Base view today - 8 days
-  - [x] Focus on today
-  - [x] Update timespan displays for multi-day time line 
-- [ ] Draw Day indicators
 
 ### 🧭 Timeline Canvas + Scrolling Architecture (FOUNDATION)
 
@@ -167,6 +162,9 @@
 ## 🧪 Session Notes
 
 ### 2026-04-20
+
+4:04p
+- [x] Draw Day indicators
 
 3:19p
 - [x] Updated timespan displays for multi- and cross-day spans
