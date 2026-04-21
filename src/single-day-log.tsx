@@ -1606,6 +1606,7 @@ function TimelineRowGroup({
                         ((rowMode === "2-row" && subRow.key === "work") ||
                             (rowMode === "4-row" && subRow.key === "driving")) &&
                         scale &&
+                        selectedId &&
                         fixtureViolationCaps.map((cap) => (
                             <ViolationCap
                                 key={`${cap.type}-${cap.time}`}

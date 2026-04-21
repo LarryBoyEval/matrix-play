@@ -163,6 +163,9 @@
 
 ### 2026-04-20
 
+6:21p
+- [x] Only show ViolationCaps when a segment is selected
+
 6:08p
 - [x] Grid now has a 'selected' segment. 
 - [x] Hover overrides selected segment for Details panel
