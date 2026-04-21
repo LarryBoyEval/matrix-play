@@ -163,6 +163,11 @@
 
 ### 2026-04-20
 
+6:08p
+- [x] Grid now has a 'selected' segment. 
+- [x] Hover overrides selected segment for Details panel
+- [x] Allow deselect of 'selected' segment
+
 4:24p
 - [x] Changed timespans over 24 hours to include 'days' (d) values also instead of just many hours
 

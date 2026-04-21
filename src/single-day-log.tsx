@@ -1175,14 +1175,19 @@ function WorkSegment({
     widthMode,
     influences,
     active,
-    onActivate,
+    //onActivate,
+    onHoverStart,
+    onHoverEnd,
+    onSelect,
 }: {
     segment: Segment;
     width: number;
     widthMode: DisplayMode;
     influences: InfluenceInterval[];
     active: boolean;
-    onActivate: () => void;
+    onHoverStart: () => void;
+    onHoverEnd: () => void;
+    onSelect: () => void;
 }) {
     const meta = kindMeta[segment.kind];
     const compactLabel = formatDurationLabelCompact(getDurationSeconds(segment));
@@ -1190,9 +1195,11 @@ function WorkSegment({
 
     return (
         <button
-            onMouseEnter={onActivate}
-            onFocus={onActivate}
-            onClick={onActivate}
+            onMouseEnter={onHoverStart}
+            onMouseLeave={onHoverEnd}
+            onFocus={onHoverStart}
+            onBlur={onHoverEnd}
+            onClick={onSelect}
             title={getSegmentHint(segment)}
             style={{
                 width: widthMode === "proportional" ? `${width}%` : width,
@@ -1256,14 +1263,18 @@ function RestSegment({
     widthMode,
     influences,
     active,
-    onActivate,
+    onHoverStart,
+    onHoverEnd,
+    onSelect,
 }: {
     segment: Segment;
     width: number;
     widthMode: DisplayMode;
     influences: InfluenceInterval[];
     active: boolean;
-    onActivate: () => void;
+    onHoverStart: () => void;
+    onHoverEnd: () => void;
+    onSelect: () => void;
 }) {
     const meta = kindMeta[segment.kind];
     const compactLabel = formatDurationLabelCompact(getDurationSeconds(segment));
@@ -1271,9 +1282,11 @@ function RestSegment({
 
     return (
         <button
-            onMouseEnter={onActivate}
-            onFocus={onActivate}
-            onClick={onActivate}
+            onMouseEnter={onHoverStart}
+            onMouseLeave={onHoverEnd}
+            onFocus={onHoverStart}
+            onBlur={onHoverEnd}
+            onClick={onSelect}
             title={getSegmentHint(segment)}
             style={{
                 width: widthMode === "proportional" ? `${width}%` : width,
@@ -1433,8 +1446,10 @@ function TimelineRowGroup({
     influences,
     highlights,
     compressedWidths,
-    activeId,
-    onActivate,
+    selectedId,
+    onHoverStart,
+    onHoverEnd,
+    onSelect,
     scale,
 }: {
     parent: ParentRow;
@@ -1444,8 +1459,10 @@ function TimelineRowGroup({
     influences: InfluenceInterval[];
     highlights: GridHighlight[];
     compressedWidths: Record<string, number>;
-    activeId: string | null;
-    onActivate: (id: string) => void;
+    selectedId: string | null;
+    onHoverStart: (id: string) => void;
+    onHoverEnd: () => void;
+    onSelect: (id: string) => void;
     scale?: TimelineScale;
 }) {
     const isRestParent = parent === "rest";
@@ -1541,8 +1558,10 @@ function TimelineRowGroup({
                                         }
                                         widthMode={mode}
                                         influences={influences}
-                                        active={activeId === segment.id}
-                                        onActivate={() => onActivate(segment.id)}
+                                        active={selectedId === segment.id}
+                                        onHoverStart={() => onHoverStart(segment.id)}
+                                        onHoverEnd={onHoverEnd}
+                                        onSelect={() => onSelect(segment.id)}
                                     />
                                 );
                             }
@@ -1558,8 +1577,10 @@ function TimelineRowGroup({
                                     }
                                     widthMode={mode}
                                     influences={influences}
-                                    active={activeId === segment.id}
-                                    onActivate={() => onActivate(segment.id)}
+                                    active={selectedId === segment.id}
+                                    onHoverStart={() => onHoverStart(segment.id)}
+                                    onHoverEnd={onHoverEnd}
+                                    onSelect={() => onSelect(segment.id)}
                                 />
                             );
                         }
@@ -1615,10 +1636,14 @@ export default function SingleDayLog() {
         () => buildGridHighlights(fixtureGridHighlightInputs),
         []
     );
-    const [activeId, setActiveId] = useState<string | null>(segments[0]?.id ?? null);
+
+    const [selectedId, setSelectedId] = useState<string | null>(null);
+    const [hoveredId, setHoveredId] = useState<string | null>(null);
+
+    const detailId = hoveredId ?? selectedId;
+    const activeSegment = segments.find((segment) => segment.id === detailId) ?? null;
 
     const compressedWidths = useMemo(() => getCompressedWidths(segments), [segments]);
-    const activeSegment = segments.find((segment) => segment.id === activeId) ?? null;
     const pixelsPerHour = 35;
     const compressedCanvasWidth = 60 * 24; // temp
 
@@ -1640,6 +1665,10 @@ export default function SingleDayLog() {
         () => timeToPx(0, timelineScale),
         [timelineScale]
     );
+
+    const handleSelect = (id: string) => {
+        setSelectedId((current) => (current === id ? null : id));
+    };
 
     return (
         <div
@@ -1778,8 +1807,10 @@ export default function SingleDayLog() {
                                     scale={timelineScale}
                                     highlights={showHighlights ? highlights : []}
                                     compressedWidths={compressedWidths}
-                                    activeId={activeId}
-                                    onActivate={setActiveId}
+                                    selectedId={selectedId}
+                                    onHoverStart={setHoveredId}
+                                    onHoverEnd={() => setHoveredId(null)}
+                                    onSelect={handleSelect}
                                 />
 
                                 <TimelineRowGroup
@@ -1791,8 +1822,10 @@ export default function SingleDayLog() {
                                     scale={timelineScale}
                                     highlights={showHighlights ? highlights : []}
                                     compressedWidths={compressedWidths}
-                                    activeId={activeId}
-                                    onActivate={setActiveId}
+                                    selectedId={selectedId}
+                                    onHoverStart={setHoveredId}
+                                    onHoverEnd={() => setHoveredId(null)}
+                                    onSelect={handleSelect}
                                 />
 
                                 {mode === "proportional" && (
