@@ -1,6 +1,11 @@
 import { useMemo, useEffect, useRef, useState } from "react";
+import type { ComponentType, SVGProps } from "react";
 import ViolationCap from "./ViolationCap";
 import { TimelineLabel } from "./TimelineLabel";
+import EldGlyph from "./assets/glyphs/eld.svg?react";
+import PunchClockGlyph from "./assets/glyphs/time-sheet.svg?react";
+import PageGlyph from "./assets/glyphs/page.svg?react";
+import NoDataGlyph from "./assets/glyphs/no-data.svg?react";
 
 type SegmentKind = "driving" | "onDuty" | "sleeper" | "offDuty";
 type DisplayMode = "compressed" | "proportional";
@@ -88,6 +93,13 @@ type ViolationCapFixture = {
     top: number;
 };
 
+type DayActiveSource = "eld" | "paperLog" | "timeCard" | "noData";
+
+type DayActiveSourceFixture = {
+    time: string; // carry-forward effective time
+    source: DayActiveSource;
+};
+
 function buildTimelineScale(
     startSecond: number,
     endSecond: number,
@@ -128,9 +140,11 @@ const ROW_LABEL_COLUMN_WIDTH = 120;
 const DAY_SECONDS = 86400;
 const DAYS_BEFORE_FOCUS = 7;
 const DAYS_AFTER_FOCUS = 1;
+const DAY_SOURCE_ICON_SIZE_PX = 12;
+
 
 const fixtureEvents: DutyEvent[] = [
-    { id: "a", kind: "offDuty", time: "-7d00:00:00" },
+    { id: "a", kind: "offDuty", time: "-6d00:00:00" },
     { id: "b", kind: "sleeper", time: "-1d22:00:01" },
     { id: "c", kind: "onDuty", time: "00:00:00" },
     { id: "d", kind: "offDuty", time: "02:45:00" },
@@ -185,7 +199,6 @@ const fixtureGridHighlightInputs: GridHighlightInput[] = [
     },
 ];
 
-
 const fixtureViolationCaps: ViolationCapFixture[] = [
     {
         type: "break",
@@ -230,11 +243,21 @@ const fixtureViolationCaps: ViolationCapFixture[] = [
 ];
 
 const fixtureTimelineLabels: TimelineLabelFixture[] = [
+    { time: "-4d00:00:00", label: "Homebase,CO" },
     { time: "09:00:00", label: "Greeley,CO·2mi" },
     { time: "10:05:00", label: "Denver,CO 2mi" },
     { time: "13:00:00", label: "Limon,CO · 4mi SSW" },
     { time: "18:30:00", label: "San Franscisco CA 13m" },
     { time: "1d19:30:00", label: "San Franscisco,CA 13mi" },
+];
+
+const fixtureDayActiveSources: DayActiveSourceFixture[] = [
+    { time: "-7d00:00:00", source: "noData" },
+    { time: "-6d00:00:00", source: "eld" },
+    { time: "-4d00:00:00", source: "paperLog" },
+    { time: "-3d00:00:00", source: "timeCard" },
+    { time: "-2d00:00:00", source: "eld" },
+    { time: "+1d00:00:00", source: "noData"}
 ];
 
 const ROW_CONFIG: Record<ParentRow, RowConfig> = {
@@ -725,12 +748,71 @@ function renderSpacer(
     );
 }
 
+function getDayActiveSourceAtSecond(
+    second: number,
+    fixtures: DayActiveSourceFixture[]
+): DayActiveSource | null {
+    let active: DayActiveSource | null = null;
+
+    for (const fixture of fixtures) {
+        const fixtureSecond = parseFixtureTime(fixture.time);
+        if (fixtureSecond <= second) {
+            active = fixture.source;
+        } else {
+            break;
+        }
+    }
+
+    return active;
+}
+
+function getDaySourceIcon(
+    source: DayActiveSource
+): ComponentType<SVGProps<SVGSVGElement>> {
+    switch (source) {
+        case "eld":
+            return EldGlyph;
+        case "paperLog":
+            return PageGlyph;
+        case "timeCard":
+            return PunchClockGlyph;
+        case "noData":
+            return NoDataGlyph;
+        default:
+            const _exhaustive: never = source;
+            return _exhaustive;
+    }
+}
+
+function buildDayActiveSources(
+    fixtures: DayActiveSourceFixture[]
+): DayActiveSourceFixture[] {
+    return [...fixtures].sort(
+        (a, b) => parseFixtureTime(a.time) - parseFixtureTime(b.time)
+    );
+}
+
+function getDaySourceTooltip(source: DayActiveSource): string {
+    switch (source) {
+        case "eld":
+            return "ELD (Acme)";
+        case "paperLog":
+            return "Paper Log";
+        case "timeCard":
+            return "Time Card";
+        case "noData":
+            return "No Data Available"
+    }
+}
+
 function Axis({
     scale,
     labels,
+    dayActiveSources,
 }: {
     scale: TimelineScale;
     labels: TimelineLabelFixture[];
+    dayActiveSources: DayActiveSourceFixture[];
 }) {
     function formatHourLabel(totalSecond: number): string {
         const secondsIntoDay = ((totalSecond % DAY_SECONDS) + DAY_SECONDS) % DAY_SECONDS;
@@ -792,28 +874,57 @@ function Axis({
                         second === scale.endSecond
                             ? Math.max(0, trackWidthPx - 1)
                             : Math.max(0, rawLeftPx);
-                    const isMidnight = ((second % DAY_SECONDS) + DAY_SECONDS) % DAY_SECONDS === 0;
+                    const isMidnight =
+                        ((second % DAY_SECONDS) + DAY_SECONDS) % DAY_SECONDS === 0;
+
+                    const activeSource = isMidnight
+                        ? getDayActiveSourceAtSecond(second, dayActiveSources)
+                        : null;
+
+                    const DaySourceIcon = activeSource
+                        ? getDaySourceIcon(activeSource)
+                        : null;
+
+                    const daySourceTooltip = activeSource
+                        ? getDaySourceTooltip(activeSource)
+                        : "";
 
                     return (
                         <div
                             key={second}
+                            title={isMidnight ? daySourceTooltip : undefined}
                             style={{
                                 position: "absolute",
                                 left: leftPx,
                                 top: 0,
                                 transform: "translateX(-50%)",
                                 textAlign: "center",
+                                cursor: isMidnight ? "default" : undefined,
                             }}
                         >
+                            {isMidnight && DaySourceIcon && (
+                                <DaySourceIcon
+                                    aria-hidden="true"
+                                    style={{
+                                        width: "auto",
+                                        height: DAY_SOURCE_ICON_SIZE_PX,
+                                        color: "#64748b",
+                                        display: "block",
+                                        margin: "0 auto",
+                                    }}
+                                />
+                            )}
+
                             <div
                                 style={{
-                                    marginTop: 4,
+                                    marginTop: isMidnight ? 0 : 4,
                                     fontSize: 10,
                                     color: "#64748b",
                                     whiteSpace: "nowrap",
                                     textAlign: "center",
                                     minWidth: 16,
                                     fontWeight: isMidnight ? 700 : 400,
+                                    lineHeight: 1.1,
                                 }}
                             >
                                 {formatHourLabel(second)}
@@ -1641,6 +1752,11 @@ export default function SingleDayLog() {
         []
     );
 
+    const dayActiveSources = useMemo(
+    () => buildDayActiveSources(fixtureDayActiveSources),
+    []
+);
+
     const [selectedId, setSelectedId] = useState<string | null>(null);
     const [hoveredId, setHoveredId] = useState<string | null>(null);
 
@@ -1836,6 +1952,7 @@ export default function SingleDayLog() {
                                     <Axis
                                         scale={timelineScale}
                                         labels={fixtureTimelineLabels}
+                                        dayActiveSources={dayActiveSources}
                                     />
                                 )}
                             </TimelineCanvas>

@@ -3,7 +3,53 @@
 ---
 
 ## 🔥 Next Up (start here every session)
-- []
+
+- [ ] Flesh out Duty Status types
+  - Corrupt ELD
+  - No Data
+  - Missing 
+
+### Day Source
+
+- [x] Display Day Source, one of:
+  - [x] ELD (and vendor?) (material design (md): 'nest display')
+  - [x] Paper log (md: 'draft')
+  - [x] Timecard: (md: 'timer?') (paper)
+  - [x] No data (md: 'block')
+  - [ ] eTimecard (merge as ELD/eData?)
+    - [ ] Missing log (No Data + color?)
+- Store timezone(?!)
+- Home terminal(?!) 
+- Totals on first pass
+- Material Design 
+  - "Label" icon might good container
+  - 'sync disabled' - ELD corrupt
+  - 'punch clock' - timecards
+  - 'draft' for plain paper image
+  - 'android batter alert' and 'battery android question' for bad eld
+  - 'detector co' has misty-dots for off line?
+  - 'scatter plot' 'bubble chart' random bubbles
+  - 'gas meter' - decent ELD
+  - 'nest display' - good ELD/screen
+  
+
+
+
+### Off Per Day Analysis and Display for Canada
+- 
+
+
+### Timezone Handling
+- [ ] Display timezone
+- [ ] Add manual timezone override ... common US/Canada plus UTC
+- [ ] Add quick programmatic timezone override
+  - Example: hover over TZ buttons (future use: cross-timezone documents)
+
+### Show paper form
+- [ ] Basic display
+- [ ] Tilted form
+- [ ] Tilted form with grid overlay
+- [ ] Click 1/4 hour to edit
 
 ### 🧭 Timeline Canvas + Scrolling Architecture (FOUNDATION)
 
@@ -19,12 +65,6 @@
 
 ### Compressed Mode (now part of shared canvas)
 - [x] Move Compressed mode into scrollable timeline architecture
-- [ ] Validate usability at wider canvas widths
-- [ ] Prototype compressed multi-day readability
-
-- [ ] Prototype compressed 'noisy/dense' driving/on-duty segments
-  - Goal: improve readability in multi-day view
-  - Question: collapse by time threshold or density?
 
 ---
 
@@ -37,6 +77,14 @@
 - [ ] Display in driver's timezone
 - [ ] Display in other US/Canadian timezones and UTC
 
+### Usability 
+- [ ] Validate usability at wider canvas widths
+- [ ] Prototype compressed multi-day readability
+
+- [ ] Prototype compressed 'noisy/dense' driving/on-duty segments
+  - Goal: improve readability in multi-day view
+  - Question: collapse by time threshold or density?
+
 
 ### Markers
 - [x] Draw day markers (1/day) on Proportional gri
@@ -48,28 +96,6 @@
 - [ ] Render duty totals per day (collapsed mode)
   - Use day marker
 
-### Day Source
-- One of:
-  - ELD (and vendor?)
-    - Maaybe timecard
-  - Paper log
-  - Paper exempt log/timecard
-  - eTimecard (merge as ELD/eData?)
-- Store timezone(?!)
-- Home terminal(?!) 
-- Totals on first pass
-
-### Timezone Handling
-- [ ] Display timezone
-- [ ] Add manual timezone override ... common US/Canada plus UTC
-- [ ] Add quick programmatic timezone override
-  - Example: hover over TZ buttons (future use: cross-timezone documents)
-
-### Show paper form
-- [ ] Basic display
-- [ ] Tilted form
-- [ ] Tilted form with grid overlay
-- [ ] Click 1/4 hour to edit
 
 ---
 
@@ -154,7 +180,13 @@
 ## 🧪 Session Notes
 
 
-#### Layout Refactor (no time math changes yet)
+#### 2026-04-23
+- 4:54
+- [x] Display Day Source, one of:
+  - [x] ELD (and vendor?) (material design (md): 'nest display')
+  - [x] Paper log (md: 'draft')
+  - [x] Timecard: (md: 'timer?') (paper)
+  - [x] No data (md: 'block')
 
 
 ### 2026-04-20
