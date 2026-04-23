@@ -3,51 +3,22 @@
 ---
 
 ## 🔥 Next Up (start here every session)
+- []
 
 ### 🧭 Timeline Canvas + Scrolling Architecture (FOUNDATION)
 
-#### Pass 1 — Layout Refactor (no time math changes yet)
-- [x] Split label column from timeline track (fixed labels, scrollable timeline)
-- [x] Introduce shared horizontal scroll viewport (Rest + Work + Axis move together)
-- [x] Wrap timeline content in `TimelineViewport` container (`overflow-x: auto`)
-- [x] Ensure Axis scrolls in sync with tracks
-- [x] Prevent page-level horizontal scroll (contain scroll to timeline only)
-
-#### Pass 2 — Timeline Scale Abstraction
-- [x] Convert Duty blocks, CounterFactual and Highlights to use calculated day widths instad of hard-coded
-- [x] Convert 'Axis' timeline to use times rather than 24 even hours
-- [x] Fixed padding-type issue with canvas vs 'track'
-- [ ] Introduce `TimelineScale` model:
-  - [ ] `startSecond`
-  - [ ] `endSecond`
-  - [ ] `durationSeconds`
-  - [ ] `pixelsPerHour` (target: 60 px/hr)
-- [ ] Replace `% of 86400` math with pixel-based helpers:
-  - [ ] `timeToPx(second)`
-  - [ ] `durationToPx(seconds)`
+- [ ] Proportional display should display should start right-justified.. show as much recent context as possible?
 - [ ] Convert Proportional mode to use pixel-based layout
-- [ ] Keep Compressed mode widths heuristic-based but rendered in same canvas
 
-#### Pass 3 — Multi-Day Canvas (8 / 14 Day Target)
-- [ ] Expand timeline to multi-day range (US: 8 days, CA: 14 days)
-- [ ] Compute `timelineStartSecond` / `timelineEndSecond`
-- [ ] Add day boundary markers
-- [ ] Add day labels (e.g., "Thu 4/18")
-- [ ] Update Axis to support multi-day display
-- [ ] Ensure highlights, overlays, and caps scale correctly across days
-
-#### Interaction + UX (initial pass)
 - [ ] Verify touch scrolling behavior (mobile/tablet)
 - [ ] Ensure segment tap works without interfering with scroll
-- [ ] Persist selected segment while scrolling
-- [ ] Add subtle edge fade indicators for scrollable region
 
 ---
 
 ## ⚡ Active Work
 
 ### Compressed Mode (now part of shared canvas)
-- [ ] Move Compressed mode into scrollable timeline architecture
+- [x] Move Compressed mode into scrollable timeline architecture
 - [ ] Validate usability at wider canvas widths
 - [ ] Prototype compressed multi-day readability
 
@@ -59,12 +30,16 @@
 
 ## 📅 Multi-Day Scrollable Region
 
-- [ ] Show 7- to 14-day side-scrolling timebar
+- [ ] Support fixed-timestamps Fixtures as well as relative-day timestamps
 - [ ] Set origin timestamp
 - [ ] Set origin timezone
+- [ ] Daylight savings adjustments
+- [ ] Display in driver's timezone
+- [ ] Display in other US/Canadian timezones and UTC
+
 
 ### Markers
-- [ ] Draw day markers (1/day)
+- [x] Draw day markers (1/day) on Proportional gri
 - [ ] Draw multi-day markers in collapsed spans
 
 ### Daily Totals
@@ -73,11 +48,28 @@
 - [ ] Render duty totals per day (collapsed mode)
   - Use day marker
 
+### Day Source
+- One of:
+  - ELD (and vendor?)
+    - Maaybe timecard
+  - Paper log
+  - Paper exempt log/timecard
+  - eTimecard (merge as ELD/eData?)
+- Store timezone(?!)
+- Home terminal(?!) 
+- Totals on first pass
+
 ### Timezone Handling
 - [ ] Display timezone
 - [ ] Add manual timezone override ... common US/Canada plus UTC
 - [ ] Add quick programmatic timezone override
   - Example: hover over TZ buttons (future use: cross-timezone documents)
+
+### Show paper form
+- [ ] Basic display
+- [ ] Tilted form
+- [ ] Tilted form with grid overlay
+- [ ] Click 1/4 hour to edit
 
 ---
 
@@ -161,98 +153,81 @@
 
 ## 🧪 Session Notes
 
+
+#### Layout Refactor (no time math changes yet)
+
+
 ### 2026-04-20
-
-6:21p
-- [x] Only show ViolationCaps when a segment is selected
-
-6:08p
-- [x] Grid now has a 'selected' segment. 
-- [x] Hover overrides selected segment for Details panel
-- [x] Allow deselect of 'selected' segment
-
-4:24p
-- [x] Changed timespans over 24 hours to include 'days' (d) values also instead of just many hours
-
-4:15p
-- [x] Fixed status panel to show seconds for Start/Finish
-
-4:10p
-- [x] Consolidate 2- and 4- row buttons
-
-4:04p
-- [x] Draw Day indicators
-
-3:19p
-- [x] Updated timespan displays for multi- and cross-day spans
-
-2:12
-- [x] Converted to 9-day timeline view (today + 7day prior, 1 day after)
-- [x] Scroll to today
-
-1:01p
-- [x] Remove mini ticks from Axis
-- [x] Make grid hour guides full-height
-
-12:11p
-- [x] Add space for TimeLabels to show cities
-- [x] Add Fixture for some cities to display
-
-10:16a 
+- 6:21p
+  - [x] Only show ViolationCaps when a segment is selected
+- 6:08p
+  - [x] Grid now has a 'selected' segment. 
+  - [x] Hover overrides selected segment for Details panel
+  - [x] Allow deselect of 'selected' segment
+- 4:24p
+  - [x] Changed timespans over 24 hours to include 'days' (d) values also instead of just many hours
+- 4:15p
+  - [x] Fixed status panel to show seconds for Start/Finish
+- 4:10p
+  - [x] Consolidate 2- and 4- row buttons
+- 4:04p
+  - [x] Draw Day indicators
+- 3:19p
+  - [x] Updated timespan displays for multi- and cross-day spans
+- 2:12
+  - [x] Converted to 9-day timeline view (today + 7day prior, 1 day after)
+  - [x] Scroll to today
+- 1:01p
+  - [x] Remove mini ticks from Axis
+  - [x] Make grid hour guides full-height
+- 12:11p
+  - [x] Add space for TimeLabels to show cities
+  - [x] Add Fixture for some cities to display
+- 10:16a 
 - [x] Refactored all times to inner track grid. AI noticed one misalignment to outer canvas which was
   a significant drift bug that needed attention
 
 
 ### 2026-04-19
-
-11:20p 
-- [x] Fix hour guidelines on grids ... no padding on right side (actually math/alignment issue)
-
-11:06p
-- [x] Switched ticks and time label stack order (ticks on bottom now)
-
-2:32p
-- [x] Basic TimelineLabel control and smoke test
-
-1:10p
-- [x] Clean up suppressed driving display: one color, rename from 'CounterFactual'
-
-12:29p
-- [x] Moved ViolationCaps to a fixture
-
-12:16p
-- [x] Center time labels on their rows in 2 and 4-line mode
-  - [x] Restructured main layout to a grid to simplify time label alignment vs. pure divs
+- 11:20p 
+  - [x] Fix hour guidelines on grids ... no padding on right side (actually math/alignment issue)
+- 11:06p
+  - [x] Switched ticks and time label stack order (ticks on bottom now)
+- 2:32p
+  - [x] Basic TimelineLabel control and smoke test
+- 1:10p
+  - [x] Clean up suppressed driving display: one color, rename from 'CounterFactual'
+- 12:29p
+  - [x] Moved ViolationCaps to a fixture
+- 12:16p
+  - [x] Center time labels on their rows in 2 and 4-line mode
+    - [x] Restructured main layout to a grid to simplify time label alignment vs. pure divs
 
 ### 2026-04-18
 
-2:43p
-- [x] Tick marks for hours and days now drawing based on time instead of screen width. Small adjustment for 'track' vs 'canvas'.
-
-1:25p
-- [x] Converted several UI timelines to use calculated day widths (24 hr) over hard coded values in prep for multi-day
-
-12:36p
-- [x] Introduced side-scrolling to (oversized) one day grid
-- [x] Moved lables out of scrolling region
+- 2:43p
+  - [x] Tick marks for hours and days now drawing based on time instead of screen width. Small adjustment for 'track' vs 'canvas'.
+- 1:25p
+  - [x] Converted several UI timelines to use calculated day widths (24 hr) over hard coded values in prep for multi-day
+- 12:36p
+  - [x] Introduced side-scrolling to (oversized) one day grid
+  - [x] Moved lables out of scrolling region
 
 ### 2026-04-17
 
-6:06p
-- [x] Use today as current date for demo purposes
-
-5:58p
-- [x] Fix timebar hints:
-  - Segment Length
-  - Start/Stop
-  - Duty Status
-  - Show dates if crossing days
-
-5:31p
-- [ ] ~~Allow seconds on Fixture timestamps~~ (already in code)
-- [x] Truncate (not round) durations to minutes for display
-- [x] Show seconds in segment detail hints
-- [x] Show "+" for exact-hour values with extra seconds (e.g., 11h+)
+- 6:06p
+  - [x] Use today as current date for demo purposes
+- 5:58p
+  - [x] Fix timebar hints:
+    - Segment Length
+    - Start/Stop
+    - Duty Status
+    - Show dates if crossing days
+- 5:31p
+  - [ ] ~~Allow seconds on Fixture timestamps~~ (already in code)
+  - [x] Truncate (not round) durations to minutes for display
+  - [x] Show seconds in segment detail hints
+  - [x] Show "+" for exact-hour values with extra seconds (e.g., 11h+)
 
 ---
 

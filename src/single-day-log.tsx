@@ -132,12 +132,15 @@ const DAYS_AFTER_FOCUS = 1;
 const fixtureEvents: DutyEvent[] = [
     { id: "a", kind: "offDuty", time: "-7d00:00:00" },
     { id: "b", kind: "sleeper", time: "-1d22:00:01" },
-    { id: "c", kind: "offDuty", time: "00:00:00" },
-    { id: "d", kind: "onDuty", time: "02:45:00" },
-    { id: "e", kind: "driving", time: "09:45:22" },
-    { id: "f", kind: "onDuty", time: "19:45:00" },
-    { id: "g", kind: "sleeper", time: "23:45:00" },
-    { id: "h", kind: "offDuty", time: "1d08:00:00" },
+    { id: "c", kind: "onDuty", time: "00:00:00" },
+    { id: "d", kind: "offDuty", time: "02:45:00" },
+    { id: "e", kind: "offDuty", time: "02:48:00" },
+    { id: "f", kind: "driving", time: "09:45:22" },
+    { id: "g", kind: "onDuty", time: "13:44:00" },
+    { id: "h", kind: "driving", time: "14:04:48" },
+    { id: "i", kind: "onDuty", time: "19:45:00" },
+    { id: "j", kind: "sleeper", time: "23:45:00" },
+    { id: "k", kind: "offDuty", time: "1d08:00:00" },
 ];
 
 const fixtureInfluences: InfluenceInterval[] = [
