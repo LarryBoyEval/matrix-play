@@ -98,6 +98,8 @@ type DayActiveSource = "eld" | "paperLog" | "timeCard" | "noData";
 type DayActiveSourceFixture = {
     time: string; // carry-forward effective time
     source: DayActiveSource;
+    imageSrc?: string;
+    imageAlt?: string;
 };
 
 function buildTimelineScale(
@@ -144,7 +146,21 @@ const DAY_SOURCE_ICON_SIZE_PX = 12;
 
 
 const fixtureEvents: DutyEvent[] = [
-    { id: "a", kind: "offDuty", time: "-6d00:00:00" },
+    { id: "a", kind: "offDuty",   time: "-6d00:00:00" },
+    { id: "a10", kind: "driving",  time: "-4d05:15:00" },
+    { id: "a20", kind: "onDuty",   time: "-4d07:45:00" },
+    { id: "a30", kind: "driving",  time: "-4d09:45:00" },
+    { id: "a40", kind: "onDuty",   time: "-4d10:15:00" },
+    { id: "a50", kind: "driving",  time: "-4d11:45:00" },
+    { id: "a60", kind: "onDuty",   time: "-4d12:30:00" },
+    { id: "a70", kind: "driving",  time: "-4d13:45:00" },
+    { id: "a80", kind: "onDuty",   time: "-4d14:30:00" },
+    { id: "a90", kind: "driving",  time: "-4d16:15:00" },
+    { id: "a94", kind: "onDuty",   time: "-4d19:45:00" },
+
+    { id: "a115", kind: "offDuty", time: "-4d22:00:00" },
+
+
     { id: "b", kind: "sleeper", time: "-1d22:00:01" },
     { id: "c", kind: "onDuty", time: "00:00:00" },
     { id: "d", kind: "offDuty", time: "02:45:00" },
@@ -243,7 +259,7 @@ const fixtureViolationCaps: ViolationCapFixture[] = [
 ];
 
 const fixtureTimelineLabels: TimelineLabelFixture[] = [
-    { time: "-4d00:00:00", label: "Homebase,CO" },
+    { time: "-4d00:00:00", label: "Paper Log" },
     { time: "09:00:00", label: "Greeley,CO·2mi" },
     { time: "10:05:00", label: "Denver,CO 2mi" },
     { time: "13:00:00", label: "Limon,CO · 4mi SSW" },
@@ -251,10 +267,17 @@ const fixtureTimelineLabels: TimelineLabelFixture[] = [
     { time: "1d19:30:00", label: "San Franscisco,CA 13mi" },
 ];
 
+import PaperLogSample from "./assets/images/AI-Sample-Log.png";
+
 const fixtureDayActiveSources: DayActiveSourceFixture[] = [
     { time: "-7d00:00:00", source: "noData" },
     { time: "-6d00:00:00", source: "eld" },
-    { time: "-4d00:00:00", source: "paperLog" },
+    {
+        time: "-4d00:00:00",
+        source: "paperLog",
+        imageSrc: PaperLogSample,
+        imageAlt: "Scanned paper log for 4/28/26",
+    },
     { time: "-3d00:00:00", source: "timeCard" },
     { time: "-2d00:00:00", source: "eld" },
     { time: "+1d00:00:00", source: "noData"}
@@ -748,16 +771,17 @@ function renderSpacer(
     );
 }
 
-function getDayActiveSourceAtSecond(
+function getDayActiveSourceFixtureAtSecond(
     second: number,
     fixtures: DayActiveSourceFixture[]
-): DayActiveSource | null {
-    let active: DayActiveSource | null = null;
+): DayActiveSourceFixture | null {
+    let active: DayActiveSourceFixture | null = null;
 
     for (const fixture of fixtures) {
         const fixtureSecond = parseFixtureTime(fixture.time);
+
         if (fixtureSecond <= second) {
-            active = fixture.source;
+            active = fixture;
         } else {
             break;
         }
@@ -795,7 +819,7 @@ function buildDayActiveSources(
 function getDaySourceTooltip(source: DayActiveSource): string {
     switch (source) {
         case "eld":
-            return "ELD (Acme)";
+            return "Acme ELD";
         case "paperLog":
             return "Paper Log";
         case "timeCard":
@@ -809,10 +833,12 @@ function Axis({
     scale,
     labels,
     dayActiveSources,
+    onOpenDaySourceImage,
 }: {
     scale: TimelineScale;
     labels: TimelineLabelFixture[];
     dayActiveSources: DayActiveSourceFixture[];
+    onOpenDaySourceImage?: (fixture: DayActiveSourceFixture) => void;
 }) {
     function formatHourLabel(totalSecond: number): string {
         const secondsIntoDay = ((totalSecond % DAY_SECONDS) + DAY_SECONDS) % DAY_SECONDS;
@@ -877,9 +903,11 @@ function Axis({
                     const isMidnight =
                         ((second % DAY_SECONDS) + DAY_SECONDS) % DAY_SECONDS === 0;
 
-                    const activeSource = isMidnight
-                        ? getDayActiveSourceAtSecond(second, dayActiveSources)
+                    const activeSourceFixture = isMidnight
+                            ? getDayActiveSourceFixtureAtSecond(second, dayActiveSources)
                         : null;
+
+                    const activeSource = activeSourceFixture?.source ?? null;
 
                     const DaySourceIcon = activeSource
                         ? getDaySourceIcon(activeSource)
@@ -889,10 +917,17 @@ function Axis({
                         ? getDaySourceTooltip(activeSource)
                         : "";
 
+                    const canOpenImage = Boolean(activeSourceFixture?.imageSrc);
+
                     return (
                         <div
                             key={second}
                             title={isMidnight ? daySourceTooltip : undefined}
+                            onClick={
+                                canOpenImage && activeSourceFixture
+                                    ? () => onOpenDaySourceImage?.(activeSourceFixture)
+                                    : undefined
+                            }
                             style={{
                                 position: "absolute",
                                 left: leftPx,
@@ -1759,6 +1794,8 @@ export default function SingleDayLog() {
 
     const [selectedId, setSelectedId] = useState<string | null>(null);
     const [hoveredId, setHoveredId] = useState<string | null>(null);
+    const [openDaySourceImage, setOpenDaySourceImage] =
+        useState<DayActiveSourceFixture | null>(null);
 
     const detailId = hoveredId ?? selectedId;
     const activeSegment = segments.find((segment) => segment.id === detailId) ?? null;
@@ -1953,6 +1990,7 @@ export default function SingleDayLog() {
                                         scale={timelineScale}
                                         labels={fixtureTimelineLabels}
                                         dayActiveSources={dayActiveSources}
+                                        onOpenDaySourceImage={setOpenDaySourceImage}
                                     />
                                 )}
                             </TimelineCanvas>
@@ -2006,6 +2044,45 @@ export default function SingleDayLog() {
                     </div>
 
                     <SegmentDetails segment={activeSegment} />
+
+                    {openDaySourceImage?.imageSrc && (
+                        <div
+                            onClick={() => setOpenDaySourceImage(null)}
+                            style={{
+                                position: "fixed",
+                                inset: 0,
+                                background: "rgba(15, 23, 42, 0.65)",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                padding: 24,
+                                zIndex: 1000,
+                            }}
+                        >
+                            <div
+                                onClick={(event) => event.stopPropagation()}
+                                style={{
+                                    maxWidth: "95vw",
+                                    maxHeight: "90vh",
+                                    background: "white",
+                                    borderRadius: 16,
+                                    padding: 12,
+                                    boxShadow: "0 20px 60px rgba(0,0,0,0.35)",
+                                }}
+                            >
+                                <img
+                                    src={openDaySourceImage.imageSrc}
+                                    alt={openDaySourceImage.imageAlt ?? "Day source document"}
+                                    style={{
+                                        display: "block",
+                                        maxWidth: "90vw",
+                                        maxHeight: "82vh",
+                                        objectFit: "contain",
+                                    }}
+                                />
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>

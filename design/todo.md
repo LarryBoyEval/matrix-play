@@ -4,10 +4,21 @@
 
 ## 🔥 Next Up (start here every session)
 
-- [ ] Flesh out Duty Status types
-  - Corrupt ELD
-  - No Data
-  - Missing 
+### Markers
+- [ ] Draw day markers (1/day) on Proportional grid
+- [ ] Draw multi-day markers in collapsed spans
+
+### Daily Totals
+- [ ] Render duty totals per day (expanded mode)
+  - Separate marker, left of next-day marker
+- [ ] Render duty totals per day (collapsed mode)
+  - Use day marker
+
+
+### Flesh out Duty Status types
+- Corrupt ELD
+- No Data
+- Missing 
 
 ### Day Source
 
@@ -53,8 +64,9 @@
 
 ### 🧭 Timeline Canvas + Scrolling Architecture (FOUNDATION)
 
+- [ ] Convert Proportional mode to use pixel-based layout (is this needed?)
+
 - [ ] Proportional display should display should start right-justified.. show as much recent context as possible?
-- [ ] Convert Proportional mode to use pixel-based layout
 
 - [ ] Verify touch scrolling behavior (mobile/tablet)
 - [ ] Ensure segment tap works without interfering with scroll
@@ -86,15 +98,6 @@
   - Question: collapse by time threshold or density?
 
 
-### Markers
-- [x] Draw day markers (1/day) on Proportional gri
-- [ ] Draw multi-day markers in collapsed spans
-
-### Daily Totals
-- [ ] Render duty totals per day (expanded mode)
-  - Separate marker, left of next-day marker
-- [ ] Render duty totals per day (collapsed mode)
-  - Use day marker
 
 
 ---

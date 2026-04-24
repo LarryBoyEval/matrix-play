@@ -419,6 +419,13 @@ Denver,CO (3mi SSW)
 - Year can always be implied with 6-month lookback
   - Hover/select for year if we do go back further (forensics)
 - Separate indicator for end-of-day (EOD) totals
+- For Proportional mode day indictators
+  - Center on duty-status block that cover date change
+    - We can place proportionally on length of duty status block (local length) if needed as an optimization later
+  - If a long block covers the start of more than one day, range-title it
+    - The duty status blocks (columns) can be small/tight; do we want day-of-month only? Stacked m as "MM" over d? 
+      i.e. "Ju" over "2" for June 2nd? 
+      - For Spans ie. "4-5" (Ma 4-5)? Ma/Ju over "31-2" May 31 to June 2nd?
 - Indicate day-type: ELD log, paper log, paper timecard, missing logs/no data. ELD timecard might be special.
   - ELD provider?
   - Day distance
