@@ -1,7 +1,7 @@
 
-import SingleDayLog from "./single-day-log";
+import MultiDayLog from "./MultidayLog";
 
 export default function App() {
-  return <SingleDayLog />;
+  return <MultiDayLog />;
 }
 

@@ -15,9 +15,6 @@ import type {
     SegmentInfluenceSummary,
 } from "./timelineTypes";
 
-import { CONDENSED_SEGMENT_GAP_PX } from "./condensedSegmentLayout";
-import { CONDENSED_AXIS_HEIGHT } from "./condensedSegmentLayout";
-
 type DisplayMode = "compressed" | "proportional";
 type RowMode = "2-row" | "4-row";
 type ParentRow = "rest" | "work";
@@ -38,11 +35,6 @@ type InfluenceInterval = {
     riskLevel?: "low" | "medium" | "high";
 };
 
-// type SegmentInfluenceSummary = {
-//     kind: InfluenceKind;
-//     seconds: number;
-//     riskLevel?: "low" | "medium" | "high";
-// };
 
 type SegmentInfluenceSlice = {
     kind: InfluenceKind;
@@ -145,6 +137,9 @@ const DAY_SECONDS = 86400;
 const DAYS_BEFORE_FOCUS = 7;
 const DAYS_AFTER_FOCUS = 1;
 const DAY_SOURCE_ICON_SIZE_PX = 18;
+import { CONDENSED_SEGMENT_GAP_PX } from "./condensedSegmentLayout";
+import { CONDENSED_AXIS_HEIGHT } from "./condensedSegmentLayout";
+
 
 
 const fixtureEvents: DutyEvent[] = [
@@ -1771,7 +1766,7 @@ function TimelineRowGroup({
     );
 }
 
-export default function SingleDayLog() {
+export default function MultiDayLog() {
     const [mode, setMode] = useState<DisplayMode>("compressed");
     const [rowMode, setRowMode] = useState<RowMode>("2-row");
     const [showHighlights, setShowHighlights] = useState(true);

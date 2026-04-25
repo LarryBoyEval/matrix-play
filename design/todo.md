@@ -5,6 +5,17 @@
 ## 🔥 Next Up (start here every session)
 
 
+## 🛏 Sleeper Splits
+- [ ] Highlight qualifying ~~sleeper~~ splittable rest bars
+- [ ] Show accumulations on both sides of qualifying rest
+  - Display grand totals
+  - Show violation state vs compliant
+
+---
+
+## 🌎 Jurisdictions
+- [ ] Timebar with flags?
+
 ### Daily Totals
 - [ ] Render duty totals per day (expanded mode)
   - Separate marker, left of next-day marker
@@ -13,7 +24,8 @@
 
 
 ### Flesh out Duty Status types
-- Corrupt ELD
+- Corrupt ELD - 
+  - Material Design: 'Fluorescent' 'Battery Android Frame Alert' 'Battery Android Frame Bolt' 'Bolt'
 - No Data
 - Missing 
 
@@ -26,6 +38,8 @@
   - [x] No data (md: 'block')
   - [ ] eTimecard (merge as ELD/eData?)
     - [ ] Missing log (No Data + color?)
+
+### Time zone
 - Store timezone(?!)
 - Home terminal(?!) 
 - Totals on first pass
@@ -98,17 +112,6 @@
 
 
 ---
-
-## 🛏 Sleeper Splits
-- [ ] Highlight qualifying ~~sleeper~~ splittable rest bars
-- [ ] Show accumulations on both sides of qualifying rest
-  - Display grand totals
-  - Show violation state vs compliant
-
----
-
-## 🌎 Jurisdictions
-- [ ] Timebar with flags?
 
 ---
 
