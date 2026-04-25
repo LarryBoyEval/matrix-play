@@ -4,9 +4,6 @@
 
 ## 🔥 Next Up (start here every session)
 
-### Markers
-- [ ] Draw day markers (1/day) on Proportional grid
-- [ ] Draw multi-day markers in collapsed spans
 
 ### Daily Totals
 - [ ] Render duty totals per day (expanded mode)
@@ -182,9 +179,16 @@
 
 ## 🧪 Session Notes
 
+### 2026-04-24
+- 6:23p
+  - [x] Draw day markers (1/day) on condensed grid
+  - [x] Draw multi-day markers in condensed spans
 
-#### 2026-04-23
-- 4:54
+### 2026-04-23
+- 6:00ish
+  - [x] Create fake paper log
+  - [x] Display paper log when icon is clicked
+- 4:54p
 - [x] Display Day Source, one of:
   - [x] ELD (and vendor?) (material design (md): 'nest display')
   - [x] Paper log (md: 'draft')

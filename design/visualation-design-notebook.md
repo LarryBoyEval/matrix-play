@@ -426,6 +426,7 @@ Denver,CO (3mi SSW)
     - The duty status blocks (columns) can be small/tight; do we want day-of-month only? Stacked m as "MM" over d? 
       i.e. "Ju" over "2" for June 2nd? 
       - For Spans ie. "4-5" (Ma 4-5)? Ma/Ju over "31-2" May 31 to June 2nd?
+  - Material Design: "Tool Tip" icon is perfect! But needs to be rotated 180 degrees
 - Indicate day-type: ELD log, paper log, paper timecard, missing logs/no data. ELD timecard might be special.
   - ELD provider?
   - Day distance

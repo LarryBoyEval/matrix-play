@@ -6,8 +6,18 @@ import EldGlyph from "./assets/glyphs/eld.svg?react";
 import PunchClockGlyph from "./assets/glyphs/time-sheet.svg?react";
 import PageGlyph from "./assets/glyphs/page.svg?react";
 import NoDataGlyph from "./assets/glyphs/no-data.svg?react";
+import CondensedAxis from "./CondensedAxis";
 
-type SegmentKind = "driving" | "onDuty" | "sleeper" | "offDuty";
+import type {
+    Segment,
+    SegmentKind,
+    InfluenceKind,
+    SegmentInfluenceSummary,
+} from "./timelineTypes";
+
+import { CONDENSED_SEGMENT_GAP_PX } from "./condensedSegmentLayout";
+import { CONDENSED_AXIS_HEIGHT } from "./condensedSegmentLayout";
+
 type DisplayMode = "compressed" | "proportional";
 type RowMode = "2-row" | "4-row";
 type ParentRow = "rest" | "work";
@@ -19,7 +29,7 @@ type DutyEvent = {
     time: string; // e.g. "00:30:00", "1d00:15:00"
 };
 
-type InfluenceKind = "personalConveyance" | "yardMove";
+// type InfluenceKind = "personalConveyance" | "yardMove";
 
 type InfluenceInterval = {
     kind: InfluenceKind;
@@ -28,11 +38,11 @@ type InfluenceInterval = {
     riskLevel?: "low" | "medium" | "high";
 };
 
-type SegmentInfluenceSummary = {
-    kind: InfluenceKind;
-    seconds: number;
-    riskLevel?: "low" | "medium" | "high";
-};
+// type SegmentInfluenceSummary = {
+//     kind: InfluenceKind;
+//     seconds: number;
+//     riskLevel?: "low" | "medium" | "high";
+// };
 
 type SegmentInfluenceSlice = {
     kind: InfluenceKind;
@@ -42,14 +52,6 @@ type SegmentInfluenceSlice = {
     overlapStartSecond: number;
     overlapEndSecond: number;
     overlapSeconds: number;
-};
-
-type Segment = {
-    id: string;
-    kind: SegmentKind;
-    startSecond: number;
-    endSecond: number;
-    influenceSummaries?: SegmentInfluenceSummary[];
 };
 
 type RowConfig = {
@@ -142,11 +144,11 @@ const ROW_LABEL_COLUMN_WIDTH = 120;
 const DAY_SECONDS = 86400;
 const DAYS_BEFORE_FOCUS = 7;
 const DAYS_AFTER_FOCUS = 1;
-const DAY_SOURCE_ICON_SIZE_PX = 12;
+const DAY_SOURCE_ICON_SIZE_PX = 18;
 
 
 const fixtureEvents: DutyEvent[] = [
-    { id: "a", kind: "offDuty",   time: "-6d00:00:00" },
+    { id: "a", kind: "offDuty",    time: "-6d00:00:00" },
     { id: "a10", kind: "driving",  time: "-4d05:15:00" },
     { id: "a20", kind: "onDuty",   time: "-4d07:45:00" },
     { id: "a30", kind: "driving",  time: "-4d09:45:00" },
@@ -280,7 +282,7 @@ const fixtureDayActiveSources: DayActiveSourceFixture[] = [
     },
     { time: "-3d00:00:00", source: "timeCard" },
     { time: "-2d00:00:00", source: "eld" },
-    { time: "+1d00:00:00", source: "noData"}
+    { time: "+2d00:00:00", source: "noData"}
 ];
 
 const ROW_CONFIG: Record<ParentRow, RowConfig> = {
@@ -425,10 +427,6 @@ function buildGridHighlights(inputs: GridHighlightInput[]): GridHighlight[] {
         opacity: highlight.opacity,
     }));
 }
-
-// function clampDayPercent(second: number): number {
-//     return Math.max(0, Math.min(100, (second / DAY_SECONDS) * 100));
-// }
 
 function GridHighlightsOverlay({
     highlights,
@@ -1630,7 +1628,7 @@ function TimelineRowGroup({
                 padding: `12px ${TRACK_X_PADDING}px`,
                 display: "grid",
                 gridTemplateRows: rowMode === "2-row" ? "1fr" : "1fr 1fr",
-                gap: 0,
+                gap: mode === "proportional" ? 0 : CONDENSED_SEGMENT_GAP_PX,
                 //gap: rowMode === "2-row" ? 0 : 8,
                 position: "relative",
                 overflow: "hidden",
@@ -1951,6 +1949,7 @@ export default function SingleDayLog() {
                             <RowLabels parent="rest" rowMode={rowMode} />
                             <RowLabels parent="work" rowMode={rowMode} />
                             {mode === "proportional" ? <AxisSpacer /> : null}
+                            {mode === "compressed" && <div style={{ height: CONDENSED_AXIS_HEIGHT }} />}
                         </div>
 
                         <TimelineViewport initialScrollLeft={mode === "proportional" ? initialScrollLeft : undefined}>
@@ -1984,6 +1983,16 @@ export default function SingleDayLog() {
                                     onHoverEnd={() => setHoveredId(null)}
                                     onSelect={handleSelect}
                                 />
+
+                                {mode === "compressed" && (
+                                    <CondensedAxis
+                                        segments={segments}
+                                        compressedWidths={compressedWidths}
+                                        daySeconds={DAY_SECONDS}
+                                        trackPaddingPx={TRACK_X_PADDING}
+                                        formatDayLabel={formatMonthDayFromOffset}
+                                    />
+                                )}
 
                                 {mode === "proportional" && (
                                     <Axis
