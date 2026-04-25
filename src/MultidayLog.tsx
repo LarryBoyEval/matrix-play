@@ -13,7 +13,7 @@ import type {
     SegmentKind,
     InfluenceKind,
     SegmentInfluenceSummary,
-    RestAnchorAnalysis,
+    RestAnchorKind,
 } from "./timelineTypes";
 
 type DisplayMode = "compressed" | "proportional";
@@ -25,6 +25,7 @@ type DutyEvent = {
     id: string;
     kind: SegmentKind;
     time: string; // e.g. "00:30:00", "1d00:15:00"
+    restAnchorKind?: RestAnchorKind;
 };
 
 // type InfluenceKind = "personalConveyance" | "yardMove";
@@ -144,7 +145,7 @@ import { CONDENSED_AXIS_HEIGHT } from "./condensedSegmentLayout";
 
 
 const fixtureEvents: DutyEvent[] = [
-    { id: "a", kind: "offDuty",    time: "-6d00:00:00" },
+    { id: "a", kind: "offDuty",    time: "-6d00:00:00", restAnchorKind: "reset" },
     { id: "a10", kind: "driving",  time: "-4d05:15:00" },
     { id: "a20", kind: "onDuty",   time: "-4d07:45:00" },
     { id: "a30", kind: "driving",  time: "-4d09:45:00" },
@@ -156,13 +157,13 @@ const fixtureEvents: DutyEvent[] = [
     { id: "a90", kind: "driving",  time: "-4d16:15:00" },
     { id: "a94", kind: "onDuty",   time: "-4d19:45:00" },
 
-    { id: "a115", kind: "offDuty", time: "-4d22:00:00" },
+    { id: "a115", kind: "offDuty", time: "-4d22:00:00", restAnchorKind: "fullRest" },
 
 
     { id: "b", kind: "sleeper", time: "-1d22:00:01" },
     { id: "c", kind: "onDuty", time: "00:00:00" },
-    { id: "d", kind: "offDuty", time: "02:45:00" },
-    { id: "e", kind: "offDuty", time: "02:48:00" },
+    { id: "d", kind: "sleeper", time: "02:45:00", restAnchorKind: "splitSleeperShort" },
+    { id: "e", kind: "offDuty", time: "05:45:00" },
     { id: "f", kind: "driving", time: "09:45:22" },
     { id: "g", kind: "onDuty", time: "13:44:00" },
     { id: "h", kind: "driving", time: "14:04:48" },
@@ -406,26 +407,8 @@ function buildSegments(
             kind: current.kind,
             startSecond: parseFixtureTime(current.time),
             endSecond: parseFixtureTime(next.time),
+            restAnchorKind: current.restAnchorKind,
         };
-
-        // TEMP: anchor rest fixture logic
-        if (segment.kind === "sleeper" && getDurationSeconds(segment) >= 3 * 3600) {
-            segment.analysis = {
-                restAnchor: {
-                    kind: "splitSleeperLong",
-                    label: "8h Sleeper",
-                },
-            };
-        }
-
-        if (segment.kind === "offDuty" && getDurationSeconds(segment) >= 10 * 3600) {
-            segment.analysis = {
-                restAnchor: {
-                    kind: "fullRest",
-                    label: "10h Off Duty",
-                },
-            };
-        }
 
         segment.influenceSummaries = getSegmentInfluenceSummaries(segment, influences);
         segments.push(segment);
@@ -1033,10 +1016,10 @@ function LegendChip({ kind }: { kind: SegmentKind }) {
 }
 
 
-function isSplitRestAnchor(anchor?: RestAnchorAnalysis): boolean {
+function isSplitRestAnchor(segment: Segment): boolean {
     return (
-        anchor?.kind === "splitSleeperLong" ||
-        anchor?.kind === "splitSleeperShort"
+        segment.restAnchorKind === "splitSleeperLong" ||
+        segment.restAnchorKind === "splitSleeperShort"
     );
 }
 
@@ -1060,7 +1043,7 @@ function SegmentDetails({ segment }: { segment: Segment | null }) {
     }
 
     const meta = kindMeta[segment.kind];
-    const anchor = segment.analysis?.restAnchor;
+    const anchorKind = segment.restAnchorKind;
 
     return (
         <div
@@ -1117,10 +1100,10 @@ function SegmentDetails({ segment }: { segment: Segment | null }) {
                 </div>
                 <div>
                     Rest Anchor:{" "}
-                    {anchor ? (
+                    {anchorKind ? (
                         <span>
-                            {anchor.label ?? anchor.kind}
-                            {isSplitRestAnchor(anchor) && " (split)"}
+                            {anchorKind}
+                            {isSplitRestAnchor(segment) && " (split)"}
                         </span>
                     ) : (
                         <span style={{ color: "#94a3b8" }}>None</span>
@@ -1463,7 +1446,8 @@ function RestSegment({
     const meta = kindMeta[segment.kind];
     const compactLabel = formatDurationLabelCompact(getDurationSeconds(segment));
     const influence = getPrimaryInfluence(segment);
-    const anchor = segment.analysis?.restAnchor;
+    const anchorKind = segment.restAnchorKind;
+    const isAnchor = Boolean(anchorKind);
 
     return (
         <button
@@ -1539,8 +1523,8 @@ function RestSegment({
                         width: "100%",
                         borderTop: `${active ? 4 : 3}px solid ${meta.restColor}`,
                         borderRadius: 9999,
-                        ...(anchor && {
-                            boxShadow: isSplitRestAnchor(anchor)
+                        ...(isAnchor && {
+                            boxShadow: isSplitRestAnchor(segment)
                                 ? "0 0 0 1px rgba(34, 197, 34, 0.71)" // subtle blue ring
                                 : "0 0 0 1px rgba(34, 197, 34, 0.5)", // subtle green ring
                         }),

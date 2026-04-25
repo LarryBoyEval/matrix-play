@@ -183,6 +183,8 @@
 ## 🧪 Session Notes
 
 ### 2026-04-25
+- 1:13p
+  - [x] Moved Anchor Rest designation into segment Fixtures
 - 11:08a
   - [x] Initial pass of highlighting 'Anchor Rests': full rests and qualifying splits
 

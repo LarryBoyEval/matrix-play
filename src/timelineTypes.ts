@@ -6,7 +6,7 @@ export type Segment = {
     startSecond: number;
     endSecond: number;
     influenceSummaries?: SegmentInfluenceSummary[];
-    analysis?: SegmentAnalysis;
+    restAnchorKind?: RestAnchorKind;
 };
 
 export type InfluenceKind = "personalConveyance" | "yardMove";
