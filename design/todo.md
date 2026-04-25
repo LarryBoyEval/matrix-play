@@ -7,6 +7,7 @@
 
 ## 🛏 Sleeper Splits
 - [x] Highlight qualifying ~~sleeper~~ splittable rest bars
+
 - [ ] Show accumulations on both sides of qualifying rest
   - Display grand totals
   - Show violation state vs compliant
@@ -183,6 +184,12 @@
 ## 🧪 Session Notes
 
 ### 2026-04-25
+- 2:51p
+  - [x] Calculate accumulated times between anchor rests
+    - [x] Driving
+    - [x] On Duty
+    - [x] Shift
+  - [x] Show accumulated times prior to an anchor test (since prior anchor rest)
 - 1:13p
   - [x] Moved Anchor Rest designation into segment Fixtures
 - 11:08a

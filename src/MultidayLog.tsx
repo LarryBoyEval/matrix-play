@@ -98,6 +98,97 @@ type DayActiveSourceFixture = {
     imageAlt?: string;
 };
 
+type WorkTotals = {
+    drivingSeconds: number;
+    onDutySeconds: number;
+    shiftSeconds: number;
+};
+
+type RestAnchorContext = {
+    anchorSegment: Segment;
+    anchorBlock: Segment[];
+    priorAnchorBlock?: Segment[];
+    totalsFromPriorAnchorBlock: WorkTotals;
+};
+
+type RestAnchorContextById = Record<string, RestAnchorContext>;
+
+function createEmptyWorkTotals(): WorkTotals {
+    return {
+        drivingSeconds: 0,
+        onDutySeconds: 0,
+        shiftSeconds: 0,
+    };
+}
+
+function isRestAnchorSegment(segment: Segment): boolean {
+    return Boolean(segment.restAnchorKind);
+}
+
+function addSegmentToWorkTotals(totals: WorkTotals, segment: Segment) {
+    const seconds = getDurationSeconds(segment);
+
+    if (segment.kind === "driving") {
+        totals.drivingSeconds += seconds;
+        totals.onDutySeconds += seconds;
+        totals.shiftSeconds += seconds;
+        return;
+    }
+
+    if (segment.kind === "onDuty") {
+        totals.onDutySeconds += seconds;
+        totals.shiftSeconds += seconds;
+        return;
+    }
+
+    if (segment.kind === "offDuty" || segment.kind === "sleeper") {
+        totals.shiftSeconds += seconds;
+    }
+}
+
+function getRestAnchorContexts(segments: Segment[]): RestAnchorContextById {
+    const contexts: RestAnchorContextById = {};
+
+    let priorAnchorBlock: Segment[] | undefined;
+    let pendingTotals = createEmptyWorkTotals();
+
+    let index = 0;
+
+    while (index < segments.length) {
+        const segment = segments[index];
+
+        if (!isRestAnchorSegment(segment)) {
+            addSegmentToWorkTotals(pendingTotals, segment);
+            index++;
+            continue;
+        }
+
+        const anchorBlock: Segment[] = [];
+
+        while (
+            index < segments.length &&
+            isRestAnchorSegment(segments[index])
+        ) {
+            anchorBlock.push(segments[index]);
+            index++;
+        }
+
+        for (const anchorSegment of anchorBlock) {
+            contexts[anchorSegment.id] = {
+                anchorSegment,
+                anchorBlock,
+                priorAnchorBlock,
+                totalsFromPriorAnchorBlock: pendingTotals,
+            };
+        }
+
+        priorAnchorBlock = anchorBlock;
+        pendingTotals = createEmptyWorkTotals();
+    }
+
+    return contexts;
+}
+
 function buildTimelineScale(
     startSecond: number,
     endSecond: number,
@@ -168,8 +259,8 @@ const fixtureEvents: DutyEvent[] = [
     { id: "g", kind: "onDuty", time: "13:44:00" },
     { id: "h", kind: "driving", time: "14:04:48" },
     { id: "i", kind: "onDuty", time: "19:45:00" },
-    { id: "j", kind: "sleeper", time: "23:45:00" },
-    { id: "k", kind: "offDuty", time: "1d08:00:00" },
+    { id: "j", kind: "sleeper", time: "23:45:00", restAnchorKind: "fullRest"  },
+    { id: "k", kind: "offDuty", time: "1d08:00:00"},
 ];
 
 const fixtureInfluences: InfluenceInterval[] = [
@@ -1023,7 +1114,13 @@ function isSplitRestAnchor(segment: Segment): boolean {
     );
 }
 
-function SegmentDetails({ segment }: { segment: Segment | null }) {
+function SegmentDetails({
+    segment,
+    restAnchorContext,
+}: {
+    segment: Segment | null;
+    restAnchorContext?: RestAnchorContext;
+}) {
     if (!segment) {
         return (
             
@@ -1068,6 +1165,9 @@ function SegmentDetails({ segment }: { segment: Segment | null }) {
                 <span style={{ fontSize: 14, fontWeight: 600, color: "#334155" }}>
                     {formatDurationLabelFull(getDurationSeconds(segment))}
                 </span>
+                <span style={{ fontSize: 14, color: "#334155" }}>
+                    {formatClock(segment.startSecond)} - {formatClock(segment.endSecond)}
+                </span>
             </div>
 
             <div
@@ -1078,9 +1178,6 @@ function SegmentDetails({ segment }: { segment: Segment | null }) {
                     color: "#475569",
                 }}
             >
-                <div>Start: {formatClock(segment.startSecond)}</div>
-                <div>End: {formatClock(segment.endSecond)}</div>
-                <div>Duration: {formatDurationLabelFull(getDurationSeconds(segment))}</div>
                 <div>Row: {meta.row === "work" ? "Work bar" : "Rest line"}</div>
                 <div>
                     Influence:{" "}
@@ -1107,6 +1204,39 @@ function SegmentDetails({ segment }: { segment: Segment | null }) {
                         </span>
                     ) : (
                         <span style={{ color: "#94a3b8" }}>None</span>
+                    )}
+                    {restAnchorContext && (
+                        <div
+                            style={{
+                                marginTop: 8,
+                                paddingTop: 0,
+                                borderTop: "1px solid #e2e8f0",
+                                display: "grid",
+                                gap: 0,
+                            }}
+                        >
+                            <div style={{ fontWeight: 700, color: "#334155" }}>
+                                Since prior anchor rest
+                            </div>
+                            <div>
+                                Driving:{" "}
+                                {formatDurationLabelFull(
+                                    restAnchorContext.totalsFromPriorAnchorBlock.drivingSeconds
+                                )}
+                            </div>
+                            <div>
+                                On Duty:{" "}
+                                {formatDurationLabelFull(
+                                    restAnchorContext.totalsFromPriorAnchorBlock.onDutySeconds
+                                )}
+                            </div>
+                            <div>
+                                Shift:{" "}
+                                {formatDurationLabelFull(
+                                    restAnchorContext.totalsFromPriorAnchorBlock.shiftSeconds
+                                )}
+                            </div>
+                        </div>
                     )}
                 </div>
             </div>
@@ -1809,6 +1939,12 @@ export default function MultiDayLog() {
         () => buildSegments(fixtureEvents, fixtureInfluences),
         []
     );
+    
+    const restAnchorContexts = useMemo(
+        () => getRestAnchorContexts(segments),
+        [segments]
+    );
+
     const highlights = useMemo(
         () => buildGridHighlights(fixtureGridHighlightInputs),
         []
@@ -2081,7 +2217,12 @@ export default function MultiDayLog() {
                         </p>
                     </div>
 
-                    <SegmentDetails segment={activeSegment} />
+                    <SegmentDetails
+                        segment={activeSegment}
+                        restAnchorContext={
+                            activeSegment ? restAnchorContexts[activeSegment.id] : undefined
+                        }
+                    />
 
                     {openDaySourceImage?.imageSrc && (
                         <div
