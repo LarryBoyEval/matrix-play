@@ -13,6 +13,7 @@ import type {
     SegmentKind,
     InfluenceKind,
     SegmentInfluenceSummary,
+    RestAnchorAnalysis,
 } from "./timelineTypes";
 
 type DisplayMode = "compressed" | "proportional";
@@ -407,9 +408,29 @@ function buildSegments(
             endSecond: parseFixtureTime(next.time),
         };
 
+        // TEMP: anchor rest fixture logic
+        if (segment.kind === "sleeper" && getDurationSeconds(segment) >= 3 * 3600) {
+            segment.analysis = {
+                restAnchor: {
+                    kind: "splitSleeperLong",
+                    label: "8h Sleeper",
+                },
+            };
+        }
+
+        if (segment.kind === "offDuty" && getDurationSeconds(segment) >= 10 * 3600) {
+            segment.analysis = {
+                restAnchor: {
+                    kind: "fullRest",
+                    label: "10h Off Duty",
+                },
+            };
+        }
+
         segment.influenceSummaries = getSegmentInfluenceSummaries(segment, influences);
         segments.push(segment);
     }
+
 
     return segments;
 }
@@ -1011,9 +1032,18 @@ function LegendChip({ kind }: { kind: SegmentKind }) {
     );
 }
 
+
+function isSplitRestAnchor(anchor?: RestAnchorAnalysis): boolean {
+    return (
+        anchor?.kind === "splitSleeperLong" ||
+        anchor?.kind === "splitSleeperShort"
+    );
+}
+
 function SegmentDetails({ segment }: { segment: Segment | null }) {
     if (!segment) {
         return (
+            
             <div
                 style={{
                     border: "1px dashed #cbd5e1",
@@ -1030,6 +1060,7 @@ function SegmentDetails({ segment }: { segment: Segment | null }) {
     }
 
     const meta = kindMeta[segment.kind];
+    const anchor = segment.analysis?.restAnchor;
 
     return (
         <div
@@ -1080,6 +1111,17 @@ function SegmentDetails({ segment }: { segment: Segment | null }) {
                                 ({formatDurationLabelFull(influence.seconds)})
                             </span>
                         ))
+                    ) : (
+                        <span style={{ color: "#94a3b8" }}>None</span>
+                    )}
+                </div>
+                <div>
+                    Rest Anchor:{" "}
+                    {anchor ? (
+                        <span>
+                            {anchor.label ?? anchor.kind}
+                            {isSplitRestAnchor(anchor) && " (split)"}
+                        </span>
                     ) : (
                         <span style={{ color: "#94a3b8" }}>None</span>
                     )}
@@ -1421,6 +1463,7 @@ function RestSegment({
     const meta = kindMeta[segment.kind];
     const compactLabel = formatDurationLabelCompact(getDurationSeconds(segment));
     const influence = getPrimaryInfluence(segment);
+    const anchor = segment.analysis?.restAnchor;
 
     return (
         <button
@@ -1440,7 +1483,8 @@ function RestSegment({
                 cursor: "pointer",
                 textAlign: "center",
                 overflow: "visible",
-            }}
+
+        }}
         >
             <div
                 style={{
@@ -1495,9 +1539,15 @@ function RestSegment({
                         width: "100%",
                         borderTop: `${active ? 4 : 3}px solid ${meta.restColor}`,
                         borderRadius: 9999,
+                        ...(anchor && {
+                            boxShadow: isSplitRestAnchor(anchor)
+                                ? "0 0 0 1px rgba(34, 197, 34, 0.71)" // subtle blue ring
+                                : "0 0 0 1px rgba(34, 197, 34, 0.5)", // subtle green ring
+                        }),
                     }}
                 />
             </div>
+
         </button>
     );
 }
@@ -1841,7 +1891,7 @@ export default function MultiDayLog() {
             >
                 <div style={{ display: "grid", gap: 8 }}>
                     <h1 style={{ margin: 0, fontSize: 30, fontWeight: 700 }}>
-                        Log Grid Proof of Concept.
+                        Log Grid Proof of Concept
                     </h1>
                     <p
                         style={{

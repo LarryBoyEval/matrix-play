@@ -6,7 +6,7 @@
 
 
 ## 🛏 Sleeper Splits
-- [ ] Highlight qualifying ~~sleeper~~ splittable rest bars
+- [x] Highlight qualifying ~~sleeper~~ splittable rest bars
 - [ ] Show accumulations on both sides of qualifying rest
   - Display grand totals
   - Show violation state vs compliant
@@ -181,6 +181,10 @@
 ---
 
 ## 🧪 Session Notes
+
+### 2026-04-25
+- 11:08a
+  - [x] Initial pass of highlighting 'Anchor Rests': full rests and qualifying splits
 
 ### 2026-04-24
 - 6:23p
