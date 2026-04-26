@@ -184,6 +184,7 @@
 ## 🧪 Session Notes
 
 ### 2026-04-25
+-11:31p [x] Rough out first display panel to two-sides of rest for split rest (hard coded only, for looks)
 - 2:51p
   - [x] Calculate accumulated times between anchor rests
     - [x] Driving

@@ -7,6 +7,7 @@ import PunchClockGlyph from "./assets/glyphs/time-sheet.svg?react";
 import PageGlyph from "./assets/glyphs/page.svg?react";
 import NoDataGlyph from "./assets/glyphs/no-data.svg?react";
 import CondensedAxis from "./CondensedAxis";
+import WorkTotalsPanel from "./WorkTotalsPanel";
 
 import type {
     Segment,
@@ -2036,6 +2037,7 @@ export default function MultiDayLog() {
                         background: "#ffffff",
                         padding: 20,
                         boxShadow: "0 1px 2px rgba(0,0,0,0.04)",
+                        position: "relative",
                     }}
                 >
                     <div
@@ -2169,6 +2171,7 @@ export default function MultiDayLog() {
                                 )}
                             </TimelineCanvas>
                         </TimelineViewport>
+                        <WorkTotalsPanel />
                     </div>
                 </div>
 
