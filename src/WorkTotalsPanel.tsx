@@ -33,12 +33,23 @@ function WorkTotalsRow({
                 style={{
                     display: "flex",
                     justifyContent: "flex-end",
-                    gap: 6,
+                    alignItems: "center",
+                    gap: 4,
                     whiteSpace: "nowrap",
                 }}
             >
-                <span style={{ fontWeight: 600, color: "#475569" }}>{label}</span>
+                <span style={{ fontWeight: 400, color: "#475569" }}>{label}</span>
                 <span style={{ fontWeight: 700, color: "#0f172a" }}>{prior}</span>
+                <span
+                    aria-hidden="true"
+                    style={{
+                        width: 0,
+                        height: 0,
+                        borderTop: "3px solid transparent",
+                        borderBottom: "3px solid transparent",
+                        borderRight: "5px solid #94a3b8",
+                    }}
+                />
             </div>
 
             <div
@@ -55,12 +66,23 @@ function WorkTotalsRow({
                 style={{
                     display: "flex",
                     justifyContent: "flex-start",
-                    gap: 6,
+                    alignItems: "center",
+                    gap: 4,
                     whiteSpace: "nowrap",
                 }}
             >
+                <span
+                    aria-hidden="true"
+                    style={{
+                        width: 0,
+                        height: 0,
+                        borderTop: "3px solid transparent",
+                        borderBottom: "3px solid transparent",
+                        borderLeft: "5px solid #94a3b8",
+                    }}
+                />
                 <span style={{ fontWeight: 700, color: "#0f172a" }}>{next}</span>
-                <span style={{ color: "#64748b", fontWeight: 500 }}>
+                <span style={{ color: "#64748b", fontWeight: 400 }}>
                     (={total})
                 </span>
             </div>
