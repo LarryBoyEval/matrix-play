@@ -184,6 +184,7 @@
 ## 🧪 Session Notes
 
 ### 2026-04-26
+- 6:12p [x] More split rest panel tuning: tighter spacing; to-the-second timespans; etc.
 - 2:42p [x] Refined split rest panel: tight spacing, arrows for direction
 
 ### 2026-04-25

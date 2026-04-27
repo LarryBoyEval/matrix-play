@@ -4,7 +4,70 @@ type WorkTotalsPanelProps = {
     style?: CSSProperties;
 };
 
-// 👇 top of file (after imports)
+
+function DirectionalDuration({
+    value,
+    direction,
+}: {
+    value: string;
+    direction: "before" | "after";
+}) {
+    const isBefore = direction === "before";
+
+    return (
+        <div
+            style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 0,
+                color: "#94a3b8",
+            }}
+        >
+            {isBefore && (
+                <span
+                    aria-hidden="true"
+                    style={{
+                        width: 0,
+                        height: 0,
+                        borderTop: "3px solid transparent",
+                        borderBottom: "3px solid transparent",
+                        borderRight: "5px solid #94a3b8",
+                    }}
+                />
+            )}
+
+            <div style={{ width: 12, height: 1, background: "#94a3b8" }} />
+
+            <span
+                style={{
+                    margin: "0 -1px",
+                    padding: "0 4px",
+                    background: "transparent",
+                    color: "#0f172a",
+                    fontWeight: 700,
+                    lineHeight: 1.2,
+                }}
+            >
+                {value}
+            </span>
+
+            <div style={{ width: 12, height: 1, background: "#94a3b8" }} />
+
+            {!isBefore && (
+                <span
+                    aria-hidden="true"
+                    style={{
+                        width: 0,
+                        height: 0,
+                        borderTop: "3px solid transparent",
+                        borderBottom: "3px solid transparent",
+                        borderLeft: "5px solid #94a3b8",
+                    }}
+                />
+            )}
+        </div>
+    );
+}
 
 function WorkTotalsRow({
     label,
@@ -34,32 +97,29 @@ function WorkTotalsRow({
                     display: "flex",
                     justifyContent: "flex-end",
                     alignItems: "center",
-                    gap: 4,
+                    gap: 6,
                     whiteSpace: "nowrap",
                 }}
             >
                 <span style={{ fontWeight: 400, color: "#475569" }}>{label}</span>
-                <span style={{ fontWeight: 700, color: "#0f172a" }}>{prior}</span>
-                <span
-                    aria-hidden="true"
-                    style={{
-                        width: 0,
-                        height: 0,
-                        borderTop: "3px solid transparent",
-                        borderBottom: "3px solid transparent",
-                        borderRight: "5px solid #94a3b8",
-                    }}
-                />
+                <DirectionalDuration value={prior} direction="before" />
             </div>
 
             <div
                 style={{
-                    textAlign: "center",
-                    color: "#94a3b8",
-                    fontWeight: 700,
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "stretch",
+                    height: "100%",
                 }}
             >
-                |
+                <div
+                    style={{
+                        width: 1,
+                        background: "#cbd5e1",
+                        borderRadius: 1,
+                    }}
+                />
             </div>
 
             <div
@@ -67,21 +127,11 @@ function WorkTotalsRow({
                     display: "flex",
                     justifyContent: "flex-start",
                     alignItems: "center",
-                    gap: 4,
+                    gap: 6,
                     whiteSpace: "nowrap",
                 }}
             >
-                <span
-                    aria-hidden="true"
-                    style={{
-                        width: 0,
-                        height: 0,
-                        borderTop: "3px solid transparent",
-                        borderBottom: "3px solid transparent",
-                        borderLeft: "5px solid #94a3b8",
-                    }}
-                />
-                <span style={{ fontWeight: 700, color: "#0f172a" }}>{next}</span>
+                <DirectionalDuration value={next} direction="after" />
                 <span style={{ color: "#64748b", fontWeight: 400 }}>
                     (={total})
                 </span>
@@ -95,7 +145,7 @@ export default function WorkTotalsPanel({ style }: WorkTotalsPanelProps) {
         <div
             style={{
                 position: "absolute",
-                top: 140,
+                top: 145,
                 left: 200,
                 width: "max-content",
                 minWidth: 0,
@@ -140,7 +190,7 @@ export default function WorkTotalsPanel({ style }: WorkTotalsPanelProps) {
                             whiteSpace: "nowrap",
                         }}
                     >
-                        10:42 Rest
+                        3:00:22 Rest
                     </div>
                 </div>
 
@@ -148,9 +198,9 @@ export default function WorkTotalsPanel({ style }: WorkTotalsPanelProps) {
             </div>
 
             <div style={{ display: "grid", gap: 4 }}>
-                <WorkTotalsRow label="Shift" prior="3:12" next="5:13" total="8:28" />
-                <WorkTotalsRow label="OnDuty" prior="2:05" next="4:12" total="6:17" />
-                <WorkTotalsRow label="Driving" prior="1:07" next="4:35" total="5:42" />
+                <WorkTotalsRow label="Shift" prior="3:12:00" next="5:13:12" total="8:28:12" />
+                <WorkTotalsRow label="OnDuty" prior="2:05:10" next="4:12:31" total="6:17:41" />
+                <WorkTotalsRow label="Driving" prior="1:06:40" next="4:35:22" total="5:42:02" />
             </div>
         </div>
     );
