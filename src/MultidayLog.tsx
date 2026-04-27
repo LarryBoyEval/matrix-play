@@ -316,7 +316,7 @@ const fixtureGridHighlightInputs: GridHighlightInput[] = [
     {
         start: "18:00:00",
         end: "22:30:00",
-        color: "#ef4444", //ef4444
+        color: "#f5f100", //ef4444
         opacity: 0.08,
     },
 ];
@@ -2128,14 +2128,14 @@ export default function MultiDayLog() {
                                 active={showInfluences}
                                 onClick={() => setShowInfluences((value) => !value)}
                             >
-                                Influences
+                                PC/YM
                             </ToolbarButton>
                             <ToolbarButton
                                 active={showHighlights}
                                 onClick={() => setShowHighlights((value) => !value)}
                             >
                                 <span style={{ opacity: mode === "proportional" ? 1 : 0.5 }}>
-                                    Highlights
+                                    Highlighter
                                 </span>
                             </ToolbarButton>
                             <ToolbarButton
