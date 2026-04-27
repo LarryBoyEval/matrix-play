@@ -184,6 +184,9 @@
 ## 🧪 Session Notes
 
 ### 2026-04-26
+- 10:55p [x] Pop-up behavior for split-rest panel at mouse-click position. This turned out to be quite
+  difficult because we had to base logic on mouse-click position and adjust for selected segment (main image scrolled)
+  positioning.
 - 6:12p [x] More split rest panel tuning: tighter spacing; to-the-second timespans; etc.
 - 2:42p [x] Refined split rest panel: tight spacing, arrows for direction
 

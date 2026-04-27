@@ -1,5 +1,5 @@
 import { useMemo, useEffect, useRef, useState } from "react";
-import type { ComponentType, SVGProps } from "react";
+import type { ComponentType, MouseEvent, SVGProps } from "react";
 import ViolationCap from "./ViolationCap";
 import { TimelineLabel } from "./TimelineLabel";
 import EldGlyph from "./assets/glyphs/eld.svg?react";
@@ -1485,7 +1485,7 @@ function WorkSegment({
     active: boolean;
     onHoverStart: () => void;
     onHoverEnd: () => void;
-    onSelect: () => void;
+    onSelect: (event: MouseEvent<HTMLButtonElement>) => void;
 }) {
     const meta = kindMeta[segment.kind];
     const compactLabel = formatDurationLabelCompact(getDurationSeconds(segment));
@@ -1572,7 +1572,7 @@ function RestSegment({
     active: boolean;
     onHoverStart: () => void;
     onHoverEnd: () => void;
-    onSelect: () => void;
+    onSelect: (event: MouseEvent<HTMLButtonElement>) => void;
 }) {
     const meta = kindMeta[segment.kind];
     const compactLabel = formatDurationLabelCompact(getDurationSeconds(segment));
@@ -1769,7 +1769,7 @@ function TimelineRowGroup({
     selectedId: string | null;
     onHoverStart: (id: string) => void;
     onHoverEnd: () => void;
-    onSelect: (id: string) => void;
+    onSelect: (id: string, event: MouseEvent<HTMLButtonElement>) => void;
     scale?: TimelineScale;
 }) {
     const isRestParent = parent === "rest";
@@ -1868,7 +1868,7 @@ function TimelineRowGroup({
                                         active={selectedId === segment.id}
                                         onHoverStart={() => onHoverStart(segment.id)}
                                         onHoverEnd={onHoverEnd}
-                                        onSelect={() => onSelect(segment.id)}
+                                        onSelect={(event) => onSelect(segment.id, event)}
                                     />
                                 );
                             }
@@ -1887,7 +1887,7 @@ function TimelineRowGroup({
                                     active={selectedId === segment.id}
                                     onHoverStart={() => onHoverStart(segment.id)}
                                     onHoverEnd={onHoverEnd}
-                                    onSelect={() => onSelect(segment.id)}
+                                    onSelect={(event) => onSelect(segment.id, event)}
                                 />
                             );
                         }
@@ -1966,7 +1966,7 @@ export default function MultiDayLog() {
 
     const compressedWidths = useMemo(() => getCompressedWidths(segments), [segments]);
     const pixelsPerHour = 35;
-    const compressedCanvasWidth = 60 * 24; // temp
+    const compressedCanvasWidth = 60 * 24;
 
     const timelineScale = useMemo(
         () =>
@@ -1977,20 +1977,49 @@ export default function MultiDayLog() {
             ),
         []
     );
+
+    const selectedRestAnchorContext =
+        selectedId != null ? restAnchorContexts[selectedId] : undefined;
+            
     const proportionalCanvasWidth = timelineScale.canvasWidthPx;
 
     const timelineCanvasWidth =
         mode === "proportional" ? proportionalCanvasWidth : compressedCanvasWidth;
 
+    const logCardRef = useRef<HTMLDivElement | null>(null);
+    const [workTotalsPanelPosition, setWorkTotalsPanelPosition] =
+        useState<{ x: number; y: number } | null>(null);
+        
     const initialScrollLeft = useMemo(
         () => timeToPx(0, timelineScale),
         [timelineScale]
     );
 
-    const handleSelect = (id: string) => {
-        setSelectedId((current) => (current === id ? null : id));
-    };
+    const handleSelect = (
+        id: string,
+        event: MouseEvent<HTMLButtonElement>
+    ) => {
+        const isAnchorRest = Boolean(restAnchorContexts[id]);
 
+        const segmentRect = event.currentTarget.getBoundingClientRect();
+        const cardRect = logCardRef.current?.getBoundingClientRect();
+
+        setSelectedId((current) => {
+            const nextSelectedId = current === id ? null : id;
+
+            if (nextSelectedId == null || !isAnchorRest || !cardRect) {
+                setWorkTotalsPanelPosition(null);
+                return nextSelectedId;
+            }
+
+            setWorkTotalsPanelPosition({
+                x: segmentRect.left + segmentRect.width / 2 - cardRect.left,
+                y: 128,
+            });
+
+            return nextSelectedId;
+        });
+    };
     return (
         <div
             style={{
@@ -2031,6 +2060,7 @@ export default function MultiDayLog() {
                 </div>
 
                 <div
+                    ref={logCardRef}
                     style={{
                         borderRadius: 24,
                         border: "1px solid #e2e8f0",
@@ -2171,7 +2201,28 @@ export default function MultiDayLog() {
                                 )}
                             </TimelineCanvas>
                         </TimelineViewport>
-                        <WorkTotalsPanel />
+                        {selectedRestAnchorContext && workTotalsPanelPosition && (
+                            <div
+                                onClick={() => {
+                                    setSelectedId(null);
+                                    setWorkTotalsPanelPosition(null);
+                                }}
+                                style={{
+                                    position: "absolute",
+                                    inset: 0,
+                                    zIndex: 998,
+                                }}
+                            >
+                                <WorkTotalsPanel
+                                    style={{
+                                        top: workTotalsPanelPosition.y,
+                                        left: workTotalsPanelPosition.x,
+                                        transform: "translateX(-50%)",
+                                        zIndex: 999,
+                                    }}
+                                />
+                            </div>
+                        )}
                     </div>
                 </div>
 

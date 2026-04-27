@@ -4,6 +4,26 @@ type WorkTotalsPanelProps = {
     style?: CSSProperties;
 };
 
+function formatDurationPreciseBrief(totalSeconds: number): string {
+    const seconds = Math.max(0, Math.floor(totalSeconds));
+
+    const days = Math.floor(seconds / 86400);
+    const hours = Math.floor((seconds % 86400) / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+
+    const parts: string[] = [];
+
+    if (days > 0) parts.push(`${days}d`);
+    if (hours > 0) parts.push(`${hours}h`);
+    if (minutes > 0) parts.push(`${minutes}m`);
+    if (secs > 0) parts.push(`${secs}s`);
+
+    // edge case: totalSeconds === 0
+    if (parts.length === 0) return "0s";
+
+    return parts.join(" ");
+}
 
 function DirectionalDuration({
     value,
@@ -143,6 +163,7 @@ function WorkTotalsRow({
 export default function WorkTotalsPanel({ style }: WorkTotalsPanelProps) {
     return (
         <div
+            onClick={(event) => event.stopPropagation()}
             style={{
                 position: "absolute",
                 top: 145,
@@ -190,7 +211,7 @@ export default function WorkTotalsPanel({ style }: WorkTotalsPanelProps) {
                             whiteSpace: "nowrap",
                         }}
                     >
-                        3:00:22 Rest
+                        3h 22s Rest
                     </div>
                 </div>
 
@@ -198,9 +219,9 @@ export default function WorkTotalsPanel({ style }: WorkTotalsPanelProps) {
             </div>
 
             <div style={{ display: "grid", gap: 4 }}>
-                <WorkTotalsRow label="Shift" prior="3:12:00" next="5:13:12" total="8:28:12" />
-                <WorkTotalsRow label="OnDuty" prior="2:05:10" next="4:12:31" total="6:17:41" />
-                <WorkTotalsRow label="Driving" prior="1:06:40" next="4:35:22" total="5:42:02" />
+                <WorkTotalsRow label="Shift" prior="3h 12m" next="5h 13m 12s" total="8h 28m 12s" />
+                <WorkTotalsRow label="OnDuty" prior="2h 5m 10s" next="4h 12m 31s" total="6h 17m 41s" />
+                <WorkTotalsRow label="Driving" prior="1h 6m 40s" next="4h 35m 22s" total="5h 42m 2s" />
             </div>
         </div>
     );
