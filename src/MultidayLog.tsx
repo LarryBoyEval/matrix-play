@@ -1962,6 +1962,7 @@ export default function MultiDayLog() {
     const [mode, setMode] = useState<DisplayMode>("proportional");
     const [rowMode, setRowMode] = useState<RowMode>("4-row");
     const [showHighlights, setShowHighlights] = useState(false);
+    const [showInfluences, setShowInfluences] = useState(false);
 
     const segments = useMemo(
         () => buildSegments(fixtureEvents, fixtureInfluences),
@@ -2124,6 +2125,12 @@ export default function MultiDayLog() {
 
                         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                             <ToolbarButton
+                                active={showInfluences}
+                                onClick={() => setShowInfluences((value) => !value)}
+                            >
+                                Influences
+                            </ToolbarButton>
+                            <ToolbarButton
                                 active={showHighlights}
                                 onClick={() => setShowHighlights((value) => !value)}
                             >
@@ -2181,7 +2188,7 @@ export default function MultiDayLog() {
                                     rowMode={rowMode}
                                     mode={mode}
                                     segments={segments}
-                                    influences={fixtureInfluences}
+                                    influences={showInfluences ? fixtureInfluences : []}
                                     scale={timelineScale}
                                     highlights={showHighlights ? highlights : []}
                                     compressedWidths={compressedWidths}
@@ -2196,7 +2203,7 @@ export default function MultiDayLog() {
                                     rowMode={rowMode}
                                     mode={mode}
                                     segments={segments}
-                                    influences={fixtureInfluences}
+                                    influences={showInfluences ? fixtureInfluences : []}
                                     scale={timelineScale}
                                     highlights={showHighlights ? highlights : []}
                                     compressedWidths={compressedWidths}
