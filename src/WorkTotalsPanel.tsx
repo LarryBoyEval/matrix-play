@@ -125,22 +125,7 @@ function WorkTotalsRow({
                 <DirectionalDuration value={prior} direction="before" />
             </div>
 
-            <div
-                style={{
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "stretch",
-                    height: "100%",
-                }}
-            >
-                <div
-                    style={{
-                        width: 1,
-                        background: "#cbd5e1",
-                        borderRadius: 1,
-                    }}
-                />
-            </div>
+            <div />
 
             <div
                 style={{
@@ -218,10 +203,33 @@ export default function WorkTotalsPanel({ style }: WorkTotalsPanelProps) {
                 <div />
             </div>
 
-            <div style={{ display: "grid", gap: 4 }}>
-                <WorkTotalsRow label="Shift" prior="3h 12m" next="5h 13m 12s" total="8h 28m 12s" />
-                <WorkTotalsRow label="OnDuty" prior="2h 5m 10s" next="4h 12m 31s" total="6h 17m 41s" />
-                <WorkTotalsRow label="Driving" prior="1h 6m 40s" next="4h 35m 22s" total="5h 42m 2s" />
+            <div
+                style={{
+                    position: "relative",
+                    display: "grid",
+                    gap: 4,
+                }}
+            >
+                <div
+                    aria-hidden="true"
+                    style={{
+                        position: "absolute",
+                        top: -6,
+                        bottom: 0,
+                        left: "50%",
+                        width: 1,
+                        transform: "translateX(-50%)",
+                        background: "#334155",
+                        borderRadius: 1,
+                        zIndex: 0,
+                    }}
+                />
+
+                <div style={{ position: "relative", zIndex: 1, display: "grid", gap: 4 }}>
+                    <WorkTotalsRow label="Shift" prior="3h 12m" next="5h 13m 12s" total="8h 28m 12s" />
+                    <WorkTotalsRow label="OnDuty" prior="2h 5m 10s" next="4h 12m 31s" total="6h 17m 41s" />
+                    <WorkTotalsRow label="Driving" prior="1h 6m 40s" next="4h 35m 22s" total="5h 42m 2s" />
+                </div>
             </div>
         </div>
     );

@@ -1914,6 +1914,11 @@ function TimelineRowGroup({
                             (rowMode === "4-row" && subRow.key === "driving")) &&
                         scale &&
                         selectedId &&
+                        segments.some(
+                            (segment) =>
+                                segment.id === selectedId &&
+                                kindMeta[segment.kind].row === "work"
+                        ) &&
                         fixtureViolationCaps.map((cap) => (
                             <ViolationCap
                                 key={`${cap.type}-${cap.time}`}
@@ -1932,9 +1937,9 @@ function TimelineRowGroup({
 }
 
 export default function MultiDayLog() {
-    const [mode, setMode] = useState<DisplayMode>("compressed");
-    const [rowMode, setRowMode] = useState<RowMode>("2-row");
-    const [showHighlights, setShowHighlights] = useState(true);
+    const [mode, setMode] = useState<DisplayMode>("proportional");
+    const [rowMode, setRowMode] = useState<RowMode>("4-row");
+    const [showHighlights, setShowHighlights] = useState(false);
 
     const segments = useMemo(
         () => buildSegments(fixtureEvents, fixtureInfluences),
@@ -2014,7 +2019,7 @@ export default function MultiDayLog() {
 
             setWorkTotalsPanelPosition({
                 x: segmentRect.left + segmentRect.width / 2 - cardRect.left,
-                y: 128,
+                y: 148,
             });
 
             return nextSelectedId;
