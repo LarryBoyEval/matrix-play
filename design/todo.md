@@ -184,6 +184,8 @@
 ## 🧪 Session Notes
 
 ### 2026-04-27
+- 12:22p
+  - [x] Condensed Proportional and Condensed grid buttons into one
 - 12:15p
   - [x] Ensure broken but contiguous anchor rests display correctly in split-rest panel
 - 12:10p
