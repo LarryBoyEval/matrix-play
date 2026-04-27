@@ -7,6 +7,7 @@ type WorkTotals = {
 };
 
 type WorkTotalsPanelProps = {
+    anchorRestSeconds: number;
     priorTotals: WorkTotals;
     nextTotals: WorkTotals;
     style?: CSSProperties;
@@ -154,6 +155,7 @@ function WorkTotalsRow({
 }
 
 export default function WorkTotalsPanel({
+    anchorRestSeconds,
     priorTotals,
     nextTotals,
     style,
@@ -165,6 +167,8 @@ export default function WorkTotalsPanel({
     const nextShift = formatDurationPreciseBrief(nextTotals.shiftSeconds);
     const nextOnDuty = formatDurationPreciseBrief(nextTotals.onDutySeconds);
     const nextDriving = formatDurationPreciseBrief(nextTotals.drivingSeconds);
+
+    const anchorRest = formatDurationPreciseBrief(anchorRestSeconds);
 
     return (
         
@@ -217,7 +221,7 @@ export default function WorkTotalsPanel({
                             whiteSpace: "nowrap",
                         }}
                     >
-                        3h 22s Rest
+                        {anchorRest} Rest
                     </div>
                 </div>
 

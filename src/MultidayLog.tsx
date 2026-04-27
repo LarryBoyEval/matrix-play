@@ -269,7 +269,8 @@ const fixtureEvents: DutyEvent[] = [
     { id: "b", kind: "sleeper", time: "-1d22:00:01" },
     { id: "c", kind: "onDuty", time: "00:00:00" },
     { id: "d", kind: "sleeper", time: "02:45:00", restAnchorKind: "splitSleeperShort" },
-    { id: "e", kind: "offDuty", time: "05:45:00" },
+    { id: "d1", kind: "offDuty", time: "05:30:00", restAnchorKind: "splitSleeperShort"  },
+    { id: "e", kind: "onDuty", time: "05:45:00" },
     { id: "f", kind: "driving", time: "09:45:22" },
     { id: "g", kind: "onDuty", time: "13:44:00" },
     { id: "h", kind: "driving", time: "14:04:48" },
@@ -576,6 +577,13 @@ function GridHighlightsOverlay({
 
 function getDurationSeconds(segment: Segment): number {
     return segment.endSecond - segment.startSecond;
+}
+
+function getTotalDurationSeconds(segments: Segment[]): number {
+    return segments.reduce(
+        (total, segment) => total + getDurationSeconds(segment),
+        0
+    );
 }
 
 function getDurationMinutes(segment: Segment): number {
@@ -2234,6 +2242,7 @@ export default function MultiDayLog() {
                             >
                                 {workTotalsPanelPosition && selectedRestAnchorContext && (
                                     <WorkTotalsPanel
+                                        anchorRestSeconds={getTotalDurationSeconds(selectedRestAnchorContext.anchorBlock)}
                                         priorTotals={selectedRestAnchorContext.totalsFromPriorAnchorBlock}
                                         nextTotals={selectedRestAnchorContext.totalsToNextAnchorBlock}
                                         style={{

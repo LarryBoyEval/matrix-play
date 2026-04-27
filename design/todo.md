@@ -184,11 +184,15 @@
 ## 🧪 Session Notes
 
 ### 2026-04-27
+- 12:15p
+  - [x] Ensure broken but contiguous anchor rests display correctly in split-rest panel
+- 12:10p
+  - [x] Show rest anchor length in rest-split panel
+- 12:02p
+  - [x] Show both side of rest-split panel stats with calculated data
 - 10:38a 
   - [x] Clean up initial display: 4 row, no violation indicators, proportional grid
   - [x] Moved split-rest panel down, and gave it proper stem for split
-- 12:02p
-  - [x] Show both side of rest-split panel stats with calculated data
 
 ### 2026-04-26
 - 10:55p [x] Pop-up behavior for split-rest panel at mouse-click position. This turned out to be quite
