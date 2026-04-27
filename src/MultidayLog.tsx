@@ -108,8 +108,9 @@ type WorkTotals = {
 type RestAnchorContext = {
     anchorSegment: Segment;
     anchorBlock: Segment[];
-    priorAnchorBlock?: Segment[];
+    anchorBlockIndex: number;
     totalsFromPriorAnchorBlock: WorkTotals;
+    totalsToNextAnchorBlock: WorkTotals;
 };
 
 type RestAnchorContextById = Record<string, RestAnchorContext>;
@@ -148,11 +149,10 @@ function addSegmentToWorkTotals(totals: WorkTotals, segment: Segment) {
 }
 
 function getRestAnchorContexts(segments: Segment[]): RestAnchorContextById {
-    const contexts: RestAnchorContextById = {};
+    const anchorBlocks: Segment[][] = [];
+    const totalsBetweenAnchorBlocks: WorkTotals[] = [];
 
-    let priorAnchorBlock: Segment[] | undefined;
     let pendingTotals = createEmptyWorkTotals();
-
     let index = 0;
 
     while (index < segments.length) {
@@ -174,17 +174,31 @@ function getRestAnchorContexts(segments: Segment[]): RestAnchorContextById {
             index++;
         }
 
+        totalsBetweenAnchorBlocks.push(pendingTotals);
+        anchorBlocks.push(anchorBlock);
+        pendingTotals = createEmptyWorkTotals();
+    }
+
+    const contexts: RestAnchorContextById = {};
+
+    for (let anchorBlockIndex = 0; anchorBlockIndex < anchorBlocks.length; anchorBlockIndex++) {
+        const anchorBlock = anchorBlocks[anchorBlockIndex];
+
+        const totalsFromPriorAnchorBlock =
+            totalsBetweenAnchorBlocks[anchorBlockIndex] ?? createEmptyWorkTotals();
+
+        const totalsToNextAnchorBlock =
+            totalsBetweenAnchorBlocks[anchorBlockIndex + 1] ?? createEmptyWorkTotals();
+
         for (const anchorSegment of anchorBlock) {
             contexts[anchorSegment.id] = {
                 anchorSegment,
                 anchorBlock,
-                priorAnchorBlock,
-                totalsFromPriorAnchorBlock: pendingTotals,
+                anchorBlockIndex,
+                totalsFromPriorAnchorBlock,
+                totalsToNextAnchorBlock,
             };
         }
-
-        priorAnchorBlock = anchorBlock;
-        pendingTotals = createEmptyWorkTotals();
     }
 
     return contexts;
@@ -2218,14 +2232,17 @@ export default function MultiDayLog() {
                                     zIndex: 998,
                                 }}
                             >
-                                <WorkTotalsPanel
-                                    style={{
-                                        top: workTotalsPanelPosition.y,
-                                        left: workTotalsPanelPosition.x,
-                                        transform: "translateX(-50%)",
-                                        zIndex: 999,
-                                    }}
-                                />
+                                {workTotalsPanelPosition && selectedRestAnchorContext && (
+                                    <WorkTotalsPanel
+                                        priorTotals={selectedRestAnchorContext.totalsFromPriorAnchorBlock}
+                                        nextTotals={selectedRestAnchorContext.totalsToNextAnchorBlock}
+                                        style={{
+                                            left: workTotalsPanelPosition.x,
+                                            top: workTotalsPanelPosition.y,
+                                            transform: "translateX(-50%)",
+                                        }}
+                                    />
+                                )}
                             </div>
                         )}
                     </div>

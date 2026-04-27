@@ -1,6 +1,14 @@
 import type { CSSProperties } from "react";
 
+type WorkTotals = {
+    drivingSeconds: number;
+    onDutySeconds: number;
+    shiftSeconds: number;
+};
+
 type WorkTotalsPanelProps = {
+    priorTotals: WorkTotals;
+    nextTotals: WorkTotals;
     style?: CSSProperties;
 };
 
@@ -145,8 +153,21 @@ function WorkTotalsRow({
     );
 }
 
-export default function WorkTotalsPanel({ style }: WorkTotalsPanelProps) {
+export default function WorkTotalsPanel({
+    priorTotals,
+    nextTotals,
+    style,
+}: WorkTotalsPanelProps) {
+    const priorShift = formatDurationPreciseBrief(priorTotals.shiftSeconds);
+    const priorOnDuty = formatDurationPreciseBrief(priorTotals.onDutySeconds);
+    const priorDriving = formatDurationPreciseBrief(priorTotals.drivingSeconds);
+
+    const nextShift = formatDurationPreciseBrief(nextTotals.shiftSeconds);
+    const nextOnDuty = formatDurationPreciseBrief(nextTotals.onDutySeconds);
+    const nextDriving = formatDurationPreciseBrief(nextTotals.drivingSeconds);
+
     return (
+        
         <div
             onClick={(event) => event.stopPropagation()}
             style={{
@@ -226,9 +247,30 @@ export default function WorkTotalsPanel({ style }: WorkTotalsPanelProps) {
                 />
 
                 <div style={{ position: "relative", zIndex: 1, display: "grid", gap: 4 }}>
-                    <WorkTotalsRow label="Shift" prior="3h 12m" next="5h 13m 12s" total="8h 28m 12s" />
-                    <WorkTotalsRow label="OnDuty" prior="2h 5m 10s" next="4h 12m 31s" total="6h 17m 41s" />
-                    <WorkTotalsRow label="Driving" prior="1h 6m 40s" next="4h 35m 22s" total="5h 42m 2s" />
+                    <WorkTotalsRow
+                        label="Shift"
+                        prior={priorShift}
+                        next={nextShift}
+                        total={formatDurationPreciseBrief(
+                            priorTotals.shiftSeconds + nextTotals.shiftSeconds
+                        )}
+                    />
+                    <WorkTotalsRow
+                        label="OnDuty"
+                        prior={priorOnDuty}
+                        next={nextOnDuty}
+                        total={formatDurationPreciseBrief(
+                            priorTotals.onDutySeconds + nextTotals.onDutySeconds
+                        )}
+                    />
+                    <WorkTotalsRow
+                        label="Driving"
+                        prior={priorDriving}
+                        next={nextDriving}
+                        total={formatDurationPreciseBrief(
+                            priorTotals.drivingSeconds + nextTotals.drivingSeconds
+                        )}
+                    />
                 </div>
             </div>
         </div>
