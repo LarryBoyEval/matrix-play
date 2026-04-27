@@ -2132,16 +2132,14 @@ export default function MultiDayLog() {
                                 </span>
                             </ToolbarButton>
                             <ToolbarButton
-                                active={mode === "compressed"}
-                                onClick={() => setMode("compressed")}
+                                active={true}
+                                onClick={() =>
+                                    setMode((value) =>
+                                        value === "compressed" ? "proportional" : "compressed"
+                                    )
+                                }
                             >
-                                Compressed
-                            </ToolbarButton>
-                            <ToolbarButton
-                                active={mode === "proportional"}
-                                onClick={() => setMode("proportional")}
-                            >
-                                Proportional
+                                {mode === "compressed" ? "Proportional" : "Compressed"}
                             </ToolbarButton>
                             <ToolbarButton
                                 active={false}
