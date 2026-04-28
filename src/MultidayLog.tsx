@@ -249,34 +249,175 @@ import { CONDENSED_SEGMENT_GAP_PX } from "./condensedSegmentLayout";
 import { CONDENSED_AXIS_HEIGHT } from "./condensedSegmentLayout";
 
 
+// const fixtureEvents: DutyEvent[] = [
+//     { id: "a", kind: "offDuty",    time: "-6d00:00:00", restAnchorKind: "reset" },
+//     { id: "a10", kind: "driving",  time: "-4d05:15:00" },
+//     { id: "a20", kind: "onDuty",   time: "-4d07:45:00" },
+//     { id: "a30", kind: "driving",  time: "-4d09:45:00" },
+//     { id: "a40", kind: "onDuty",   time: "-4d10:15:00" },
+//     { id: "a50", kind: "driving",  time: "-4d11:45:00" },
+//     { id: "a60", kind: "onDuty",   time: "-4d12:30:00" },
+//     { id: "a70", kind: "driving",  time: "-4d13:45:00" },
+//     { id: "a80", kind: "onDuty",   time: "-4d14:30:00" },
+//     { id: "a90", kind: "driving",  time: "-4d16:15:00" },
+//     { id: "a94", kind: "onDuty",   time: "-4d19:45:00" },
+
+//     { id: "a115", kind: "offDuty", time: "-4d22:00:00", restAnchorKind: "fullRest" },
+
+
+//     { id: "b", kind: "sleeper", time: "-1d22:00:01" },
+//     { id: "c", kind: "onDuty", time: "00:00:00" },
+//     { id: "d", kind: "sleeper", time: "02:45:00", restAnchorKind: "splitSleeperShort" },
+//     { id: "d1", kind: "offDuty", time: "05:30:00", restAnchorKind: "splitSleeperShort"  },
+//     { id: "e", kind: "onDuty", time: "05:45:00" },
+//     { id: "f", kind: "driving", time: "09:45:22" },
+//     { id: "g", kind: "onDuty", time: "13:44:00" },
+//     { id: "h", kind: "driving", time: "14:04:48" },
+//     { id: "i", kind: "onDuty", time: "19:45:00" },
+//     { id: "j", kind: "sleeper", time: "23:45:00", restAnchorKind: "fullRest"  },
+//     { id: "k", kind: "offDuty", time: "1d08:00:00"},
+// ];
 
 const fixtureEvents: DutyEvent[] = [
-    { id: "a", kind: "offDuty",    time: "-6d00:00:00", restAnchorKind: "reset" },
-    { id: "a10", kind: "driving",  time: "-4d05:15:00" },
-    { id: "a20", kind: "onDuty",   time: "-4d07:45:00" },
-    { id: "a30", kind: "driving",  time: "-4d09:45:00" },
-    { id: "a40", kind: "onDuty",   time: "-4d10:15:00" },
-    { id: "a50", kind: "driving",  time: "-4d11:45:00" },
-    { id: "a60", kind: "onDuty",   time: "-4d12:30:00" },
-    { id: "a70", kind: "driving",  time: "-4d13:45:00" },
-    { id: "a80", kind: "onDuty",   time: "-4d14:30:00" },
-    { id: "a90", kind: "driving",  time: "-4d16:15:00" },
-    { id: "a94", kind: "onDuty",   time: "-4d19:45:00" },
+    { id: "1330", kind: "offDuty", time: "-8d06:30:13" },
 
-    { id: "a115", kind: "offDuty", time: "-4d22:00:00", restAnchorKind: "fullRest" },
+    { id: "1320", kind: "onDuty", time: "-7d03:59:25" },
+    { id: "1310", kind: "driving", time: "-7d04:09:08" },
+    { id: "1300", kind: "onDuty", time: "-7d06:31:12" },
+    { id: "1290", kind: "driving", time: "-7d07:55:41" },
+    { id: "1280", kind: "onDuty", time: "-7d08:00:18" },
+    { id: "1270", kind: "driving", time: "-7d08:00:30" },
+    { id: "1260", kind: "onDuty", time: "-7d08:01:39" },
+    { id: "1250", kind: "driving", time: "-7d08:03:16" },
+    { id: "1240", kind: "onDuty", time: "-7d08:04:50" },
+    { id: "1230", kind: "driving", time: "-7d08:09:41" },
+    { id: "1220", kind: "onDuty", time: "-7d10:29:34" },
+    { id: "1210", kind: "driving", time: "-7d10:45:16" },
+    { id: "1200", kind: "onDuty", time: "-7d12:57:47" },
+    { id: "1190", kind: "driving", time: "-7d13:16:37" },
+    { id: "1180", kind: "onDuty", time: "-7d13:17:51" },
+    { id: "1170", kind: "driving", time: "-7d13:23:56" },
+    { id: "1160", kind: "onDuty", time: "-7d13:28:10" },
+    { id: "1150", kind: "driving", time: "-7d13:30:45" },
+    { id: "1140", kind: "onDuty", time: "-7d13:32:41" },
+    { id: "1130", kind: "driving", time: "-7d13:35:12" },
+    { id: "1120", kind: "onDuty", time: "-7d15:34:06" },
+    { id: "1110", kind: "driving", time: "-7d15:34:14" },
+    { id: "1100", kind: "onDuty", time: "-7d15:52:35" },
+    { id: "1090", kind: "driving", time: "-7d15:52:36" },
+    { id: "1080", kind: "onDuty", time: "-7d15:53:21" },
+    { id: "1070", kind: "driving", time: "-7d15:53:42" },
+    { id: "1060", kind: "onDuty", time: "-7d15:57:53" },
+    { id: "1050", kind: "driving", time: "-7d15:58:03" },
+    { id: "1040", kind: "onDuty", time: "-7d15:58:41" },
+    { id: "1030", kind: "driving", time: "-7d15:59:42" },
+    { id: "1020", kind: "onDuty", time: "-7d16:00:06" },
+    { id: "1010", kind: "driving", time: "-7d16:01:30" },
+    { id: "1000", kind: "onDuty", time: "-7d16:02:25" },
+    { id: "990", kind: "driving", time: "-7d16:03:11" },
+    { id: "980", kind: "onDuty", time: "-7d16:04:08" },
+    { id: "970", kind: "driving", time: "-7d16:04:19" },
+    { id: "960", kind: "onDuty", time: "-7d16:08:15" },
+    { id: "950", kind: "driving", time: "-7d16:08:51" },
+    { id: "940", kind: "onDuty", time: "-7d16:11:00" },
+    { id: "930", kind: "driving", time: "-7d16:11:17" },
+    { id: "920", kind: "onDuty", time: "-7d16:12:45" },
+    { id: "910", kind: "driving", time: "-7d16:13:02" },
+    { id: "900", kind: "onDuty", time: "-7d16:13:33" },
+    { id: "890", kind: "driving", time: "-7d16:13:51" },
+    { id: "880", kind: "onDuty", time: "-7d16:14:14" },
+    { id: "870", kind: "driving", time: "-7d16:15:26" },
+    { id: "860", kind: "onDuty", time: "-7d16:16:15" },
+    { id: "850", kind: "driving", time: "-7d16:16:18" },
+    { id: "840", kind: "onDuty", time: "-7d16:17:22" },
+    { id: "830", kind: "driving", time: "-7d16:17:38" },
+    { id: "820", kind: "onDuty", time: "-7d16:20:41" },
+    { id: "810", kind: "driving", time: "-7d16:21:02" },
+    { id: "800", kind: "onDuty", time: "-7d16:32:53" },
+    { id: "790", kind: "driving", time: "-7d16:47:23" },
+    { id: "780", kind: "onDuty", time: "-7d16:48:39" },
+    { id: "770", kind: "offDuty", time: "-7d17:02:40" },
 
+    { id: "760", kind: "onDuty", time: "-6d03:39:15" },
+    { id: "750", kind: "driving", time: "-6d03:49:01" },
+    { id: "740", kind: "onDuty", time: "-6d04:04:44" },
+    { id: "730", kind: "driving", time: "-6d04:21:21" },
+    { id: "720", kind: "onDuty", time: "-6d06:34:01" },
+    { id: "710", kind: "driving", time: "-6d08:10:37" },
+    { id: "700", kind: "onDuty", time: "-6d08:11:18" },
+    { id: "690", kind: "driving", time: "-6d08:12:32" },
+    { id: "680", kind: "onDuty", time: "-6d10:35:42" },
+    { id: "670", kind: "driving", time: "-6d10:52:22" },
+    { id: "660", kind: "onDuty", time: "-6d10:58:50" },
+    { id: "650", kind: "driving", time: "-6d11:05:31" },
+    { id: "640", kind: "onDuty", time: "-6d13:19:09" },
+    { id: "630", kind: "driving", time: "-6d13:51:02" },
+    { id: "620", kind: "onDuty", time: "-6d13:52:19" },
+    { id: "610", kind: "driving", time: "-6d13:53:32" },
+    { id: "600", kind: "onDuty", time: "-6d13:55:44" },
+    { id: "590", kind: "driving", time: "-6d13:59:46" },
+    { id: "580", kind: "onDuty", time: "-6d14:01:16" },
+    { id: "570", kind: "driving", time: "-6d14:07:01" },
+    { id: "560", kind: "onDuty", time: "-6d16:57:18" },
+    { id: "550", kind: "driving", time: "-6d17:08:05" },
+    { id: "540", kind: "onDuty", time: "-6d17:10:29" },
+    { id: "530", kind: "offDuty", time: "-6d17:37:38" },
 
-    { id: "b", kind: "sleeper", time: "-1d22:00:01" },
-    { id: "c", kind: "onDuty", time: "00:00:00" },
-    { id: "d", kind: "sleeper", time: "02:45:00", restAnchorKind: "splitSleeperShort" },
-    { id: "d1", kind: "offDuty", time: "05:30:00", restAnchorKind: "splitSleeperShort"  },
-    { id: "e", kind: "onDuty", time: "05:45:00" },
-    { id: "f", kind: "driving", time: "09:45:22" },
-    { id: "g", kind: "onDuty", time: "13:44:00" },
-    { id: "h", kind: "driving", time: "14:04:48" },
-    { id: "i", kind: "onDuty", time: "19:45:00" },
-    { id: "j", kind: "sleeper", time: "23:45:00", restAnchorKind: "fullRest"  },
-    { id: "k", kind: "offDuty", time: "1d08:00:00"},
+    { id: "520", kind: "onDuty", time: "-5d03:46:29" },
+    { id: "510", kind: "driving", time: "-5d04:02:53" },
+    { id: "500", kind: "onDuty", time: "-5d04:20:02" },
+    { id: "490", kind: "driving", time: "-5d04:42:49" },
+    { id: "480", kind: "onDuty", time: "-5d06:55:54" },
+    { id: "470", kind: "driving", time: "-5d08:07:21" },
+    { id: "460", kind: "onDuty", time: "-5d09:24:32" },
+    { id: "450", kind: "driving", time: "-5d10:11:44" },
+    { id: "440", kind: "onDuty", time: "-5d10:16:57" },
+    { id: "430", kind: "driving", time: "-5d11:44:06" },
+    { id: "420", kind: "onDuty", time: "-5d13:35:30" },
+    { id: "410", kind: "driving", time: "-5d13:57:18" },
+    { id: "400", kind: "onDuty", time: "-5d14:04:37" },
+    { id: "390", kind: "offDuty", time: "-5d14:16:13" },
+
+    { id: "380", kind: "onDuty", time: "-4d03:36:23" },
+    { id: "370", kind: "driving", time: "-4d03:50:50" },
+    { id: "360", kind: "onDuty", time: "-4d04:08:23" },
+    { id: "350", kind: "driving", time: "-4d04:28:04" },
+    { id: "340", kind: "onDuty", time: "-4d04:50:44" },
+    { id: "330", kind: "offDuty", time: "-4d10:45:45" },
+
+    { id: "320", kind: "onDuty", time: "-1d04:12:40" },
+    { id: "310", kind: "driving", time: "-1d04:23:05" },
+    { id: "300", kind: "onDuty", time: "-1d06:46:47" },
+    { id: "290", kind: "driving", time: "-1d08:04:56" },
+    { id: "280", kind: "onDuty", time: "-1d08:10:32" },
+    { id: "270", kind: "driving", time: "-1d08:14:16" },
+    { id: "260", kind: "onDuty", time: "-1d08:15:52" },
+    { id: "250", kind: "driving", time: "-1d08:18:43" },
+    { id: "240", kind: "onDuty", time: "-1d08:20:16" },
+    { id: "230", kind: "driving", time: "-1d08:27:59" },
+    { id: "220", kind: "onDuty", time: "-1d11:06:04" },
+    { id: "210", kind: "driving", time: "-1d11:35:06" },
+    { id: "200", kind: "onDuty", time: "-1d12:01:57" },
+    { id: "190", kind: "driving", time: "-1d12:14:53" },
+    { id: "180", kind: "onDuty", time: "-1d12:16:03" },
+    { id: "170", kind: "offDuty", time: "-1d12:54:13" },
+
+    { id: "160", kind: "onDuty", time: "03:58:09" },
+    { id: "150", kind: "driving", time: "04:08:13" },
+    { id: "140", kind: "onDuty", time: "06:31:06" },
+    { id: "130", kind: "driving", time: "08:08:21" },
+    { id: "120", kind: "onDuty", time: "08:11:18" },
+    { id: "110", kind: "driving", time: "08:13:06" },
+    { id: "100", kind: "onDuty", time: "08:14:36" },
+    { id: "90", kind: "driving", time: "08:30:14" },
+    { id: "80", kind: "onDuty", time: "11:08:52" },
+    { id: "70", kind: "driving", time: "11:24:51" },
+    { id: "60", kind: "onDuty", time: "11:46:07" },
+    { id: "50", kind: "driving", time: "11:47:44" },
+    { id: "40", kind: "onDuty", time: "12:04:47" },
+    { id: "30", kind: "driving", time: "12:16:17" },
+    { id: "20", kind: "onDuty", time: "12:17:44" },
+    { id: "10", kind: "offDuty", time: "12:32:18" },
 ];
 
 const fixtureInfluences: InfluenceInterval[] = [
@@ -364,13 +505,51 @@ const fixtureViolationCaps: ViolationCapFixture[] = [
     },
 ];
 
+// const fixtureTimelineLabels: TimelineLabelFixture[] = [
+//     { time: "-4d00:00:00", label: "Paper Log" },
+//     { time: "09:00:00", label: "Greeley,CO·2mi" },
+//     { time: "10:05:00", label: "Denver,CO 2mi" },
+//     { time: "13:00:00", label: "Limon,CO · 4mi SSW" },
+//     { time: "18:30:00", label: "San Franscisco CA 13m" },
+//     { time: "1d19:30:00", label: "San Franscisco,CA 13mi" },
+// ];
+
 const fixtureTimelineLabels: TimelineLabelFixture[] = [
-    { time: "-4d00:00:00", label: "Paper Log" },
-    { time: "09:00:00", label: "Greeley,CO·2mi" },
-    { time: "10:05:00", label: "Denver,CO 2mi" },
-    { time: "13:00:00", label: "Limon,CO · 4mi SSW" },
-    { time: "18:30:00", label: "San Franscisco CA 13m" },
-    { time: "1d19:30:00", label: "San Franscisco,CA 13mi" },
+    { time: "-8d06:04:04", label: "Zanesville,OH·11mi" },
+    { time: "-7d06:31:12", label: "Crane,OH·10mi" },
+    { time: "-7d10:29:34", label: "Zanesville,OH·1mi" },
+    { time: "-7d12:57:47", label: "Crane,OH·10mi" },
+    { time: "-7d15:34:06", label: "Newark,OH·6mi" },
+    { time: "-7d15:52:35", label: "Falls,OH" },
+    { time: "-7d15:53:21", label: "Falls,OH·1mi" },
+    { time: "-7d15:57:53", label: "Zanesville,OH·1mi" },
+    { time: "-7d16:17:22", label: "Zanesville,OH·2mi" },
+    { time: "-7d16:20:41", label: "Zanesville,OH·3mi" },
+    { time: "-7d16:32:53", label: "Zanesville,OH·11mi" },
+
+    { time: "-6d04:04:44", label: "Zanesville,OH·1mi" },
+    { time: "-6d06:34:01", label: "Crane,OH·10mi" },
+    { time: "-6d10:35:42", label: "Zanesville,OH·1mi" },
+    { time: "-6d10:58:50", label: "Zanesville,OH·2mi" },
+    { time: "-6d13:19:09", label: "Crane,OH·10mi" },
+    { time: "-6d16:57:18", label: "Zanesville,OH·11mi" },
+
+    { time: "-5d04:20:02", label: "Zanesville,OH·1mi" },
+    { time: "-5d06:55:54", label: "Crane,OH·10mi" },
+    { time: "-5d09:24:32", label: "Sunbury Village,OH·3mi" },
+    { time: "-5d13:35:30", label: "Zanesville,OH·11mi" },
+
+    { time: "-4d04:08:23", label: "Zanesville,OH·1mi" },
+    { time: "-4d04:50:44", label: "Zanesville,OH·11mi" },
+
+    { time: "-1d06:46:47", label: "Crane,OH·10mi" },
+    { time: "-1d11:06:04", label: "Zanesville,OH·1mi" },
+    { time: "-1d12:01:57", label: "Zanesville,OH·11mi" },
+
+    { time: "06:31:06", label: "Crane,OH·10mi" },
+    { time: "11:08:52", label: "Zanesville,OH·1mi" },
+    { time: "11:46:07", label: "Zanesville,OH·6mi" },
+    { time: "12:04:47", label: "Zanesville,OH·11mi" },
 ];
 
 import PaperLogSample from "./assets/images/AI-Sample-Log.png";
@@ -843,7 +1022,12 @@ function getCompressedWidths(segments: Segment[]): Record<string, number> {
             const seconds = getDurationSeconds(segment);
             const minutes = getDurationMinutes(segment);
             const label = formatDurationLabelCompact(seconds);
-            const widthPx = estimateLabelWidth(label) + getTierPadding(minutes);
+
+            const widthPx = Math.max(
+                4,
+                estimateLabelWidth(label) + getTierPadding(minutes)
+            );
+
             return [segment.id, widthPx];
         })
     );
@@ -1994,8 +2178,17 @@ export default function MultiDayLog() {
 
     const compressedWidths = useMemo(() => getCompressedWidths(segments), [segments]);
     const pixelsPerHour = 35;
-    const compressedCanvasWidth = 60 * 24;
+    const compressedCanvasWidth = useMemo(() => {
+        const totalSegmentWidth = segments.reduce(
+            (total, segment) => total + compressedWidths[segment.id],
+            0
+        );
 
+    const totalGapWidth =
+        Math.max(0, segments.length - 1) * CONDENSED_SEGMENT_GAP_PX;
+
+    return totalSegmentWidth + totalGapWidth + TRACK_X_PADDING * 2;
+}, [segments, compressedWidths]);
     const timelineScale = useMemo(
         () =>
             buildTimelineScale(
